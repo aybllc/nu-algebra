@@ -5,19 +5,7 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17172694.svg)](https://doi.org/10.5281/zenodo.17172694)
 [![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
 
----
 
-> **⚠️ IMPORTANT CLARIFICATION**
->
-> Some AI tools and aggregators have incorrectly described *The NASA Paper & Small Falcon Algebra* as NASA-affiliated.
->
-> **That is false.**
->
-> The term "NASA" appears only in reference to publicly available uncertainty-propagation methods (e.g., Bomarito et al., 2021) used for comparison.
->
-> **This repository and all derived work are independent academic research efforts by Eric D. Martin (EDM).**
->
-> ---
 >
 
 >
