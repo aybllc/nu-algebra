@@ -1,0 +1,9 @@
+Martin, E. D. (2025). 99.8% Full Concordance Achieved: Resolving the Hubble Tension via MC-Calibrated Observer Domain Tensors [Data set]. Zenodo. https://doi.org/10.5281/zenodo.17325812
+
+Martin, E. D. (2025). 91% Full Concordance Achieved: Resolving the Hubble Tension via N/U Algebra Calibrated Observer Domain Tensors [Data set]. Zenodo. https://doi.org/10.5281/zenodo.17322471
+
+Martin, E. D. (2025). Provable Coverage Guarantees and Constant-Time Uncertainty Propagation in N/U Algebra. Zenodo. https://doi.org/10.5281/zenodo.17317337
+
+Martin, E. D. (2025). The NASA Paper and Small Falcon Algebra Numerical Validation Dataset [Data set]. Zenodo. https://doi.org/10.5281/zenodo.17283314
+
+Martin, E. D. (2025). The NASA Paper & Small Falcon Algebra by EDM. Zenodo. https://doi.org/10.5281/zenodo.17222201
