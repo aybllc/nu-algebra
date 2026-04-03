@@ -1,0 +1,141 @@
+
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{titlesec}
+\titleformat{\section}{\normalfont\large\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}{\normalfont\normalsize\bfseries}{\thesubsection}{1em}{}
+\title{A Defensible Hypothesis for the N/U Reasoning Framework: Compositional Uncertainty, Governance Logic, and Auditability}
+\author{Anonymous for Review}
+\date{October 10, 2025}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This manuscript states and motivates a defendable hypothesis about the N/U Reasoning Framework. The hypothesis is that N/U constitutes a novel algebraic system that integrates compositional uncertainty propagation, governance logic, and auditability. These features are absent in probabilistic, interval, and epistemic models. The result is reproducible, bounded, and interpretable reasoning chains that are suitable for formal audit and AI governance. We situate the hypothesis within peer--reviewed literature on uncertainty quantification, AI audit, and formal reasoning. We then outline testable predictions and an evaluation plan that would allow independent researchers to verify or falsify the hypothesis.
+\end{abstract}
+
+\section{Hypothesis Statement}
+\textbf{Hypothesis.} The N/U Reasoning Framework constitutes a novel algebraic system that fills a critical gap in scientific and AI decision making by integrating compositional uncertainty propagation, governance logic, and auditability. These properties enable reproducible, bounded, and interpretable reasoning chains that are suitable for formal audit and AI governance.
+
+\section{Background and Problem Statement}
+Modern AI systems need calibrated and traceable uncertainty through multi--step pipelines as well as governance mechanisms that enforce operational constraints and preserve invariants. Current practices lean on probabilistic or simulation--based approaches for uncertainty propagation and on policy or process frameworks for audit and control. The literature shows a gap between these two tracks: there is limited support for deterministic algebraic composition of uncertainty that also embeds governance and provenance across chained reasoning steps \cite{Mezzi2024,Zhao2025,NASA2023,IIA2024,IBM2025}.
+
+\section{N/U Primitives and Design Objectives}
+N/U targets three objectives: compositional uncertainty, governance, and auditability.
+\subsection{Compositional Uncertainty Propagation}
+Let each atomic datum be represented as a pair $(v,u)$ where $v$ is a value in a base set (for example a real vector) and $u$ is a bounded nonnegative quantity that encodes an uncertainty radius or bound. Define closed operators $\oplus$, $\otimes$, and $\odot$ on these pairs so that for any inputs $(v_i,u_i)$ the output $(v',u')$ satisfies conservative and invariant--preserving bounds:
+\begin{equation}
+(v',u') = F\big((v_1,u_1),\dots,(v_k,u_k)\big)
+\qquad \text{with} \qquad
+u' \leq B(u_1,\dots,u_k),
+\end{equation}
+where $B$ is a deterministic bound function derived from algebraic rules rather than sampling. The design goal is that composition is associative where appropriate and monotone in each $u_i$, which supports chained reasoning with predictable growth of uncertainty. This contrasts with Monte Carlo estimators and purely probabilistic methods that do not deliver closed algebraic bounds in general \cite{NASA2023,Padilla2022}.
+
+\subsection{Governance Logic}
+N/U includes threshold--triggered control over reasoning steps. Write $\mathsf{Catch}_\alpha$ for a guard that routes or halts a step when the current bound exceeds a policy threshold $\alpha$:
+\begin{equation}
+\mathsf{Catch}_\alpha\big((v,u)\big)=
+\begin{cases}
+\text{continue with } (v,u), & u \le \alpha,\\[2pt]
+\text{route to remediation or halt}, & u > \alpha.
+\end{cases}
+\end{equation}
+A meta--operator $\mathsf{Flip}$ encodes promoted uncertainty or representation change when governance requires it, for example switching from point to interval representation or increasing conservatism after a policy infraction. These controls are part of the algebra rather than external process documents and therefore are composable with the operators above.
+
+\subsection{Auditability via Provenance}
+Every operation emits a provenance token $\rho$ that records inputs, operator identity, local bounds, policy events, and a digest. The set of tokens forms a directed acyclic provenance graph for the reasoning chain. Because operators are deterministic on their inputs, the chain is reproducible and auditable by construction. This addresses gaps identified by audit frameworks that call for traceable uncertainty but lack mathematical mechanisms \cite{IIA2024,IBM2025}.
+
+\section{Relation to Existing Formalisms}
+Table~\ref{tab:comparison} contrasts N/U with common formalisms. Prior models offer either uncertainty propagation without embedded governance and provenance, or governance and provenance without a compositional uncertainty algebra.
+\begin{table}[h]
+\centering
+\begin{tabular}{lcccc}
+\toprule
+Framework & Uncertainty propagation & Governance logic & Auditability & Compositional algebra \\\midrule
+Bayesian models & Probabilistic & No & Limited & No \\
+Interval arithmetic & Conservative bounds & No & No & Partial \\
+Epistemic logic & Modal belief & No & No & No \\
+Formal verification & Proof based & No & Yes & No \\
+N/U Framework & Deterministic bounds & Yes & Yes & Yes \\
+\bottomrule
+\end{tabular}
+\caption{Comparison with existing formalisms, following the gaps in \cite{Ruspini2004,VanEijck2023}.}
+\label{tab:comparison}
+\end{table}
+
+\section{Supporting Evidence from the Literature}
+Work in AI risk and governance identifies the need for uncertainty propagation but does not supply a closed algebra \cite{Mezzi2024,Zhao2025}. Audit frameworks emphasize traceability under regulation but stop short of mathematical rules for uncertainty \cite{IIA2024,IBM2025}. Tutorials on uncertainty quantification and studies on uncertainty presentation focus on statistical and simulation methods rather than algebraic composition \cite{NASA2023,Padilla2022}. Research in epistemic and fuzzy logics provides rich semantics yet lacks thresholded governance and reproducible algebra for bounds \cite{Ruspini2004,VanEijck2023,Yan2025,Alali2025}. These gaps motivate the N/U hypothesis.
+
+\section{Testable Predictions}
+If the hypothesis is correct then:
+\begin{enumerate}[itemsep=2pt,topsep=2pt]
+\item \textbf{Reproducibility}. Reasoning chains produce identical outputs and provenance when rerun on the same inputs and policies.
+\item \textbf{Boundedness}. Empirical error lies within algebraic bounds at a target coverage rate for a specified class of operators.
+\item \textbf{Calibration improvement}. Compared with statistical stepwise propagation, N/U yields tighter or equally valid bounds with better decision calibration in multi--step pipelines \cite{Zhao2025}.
+\item \textbf{Audit completeness}. Provenance tokens $\rho$ permit step--level reconstruction that satisfies audit criteria in \cite{IIA2024,IBM2025}.
+\end{enumerate}
+
+\section{Evaluation Protocol}
+\textbf{Benchmarks}. Multi--agent or tool--augmented LLM pipelines where each step has observable ground truth and error.\\
+\textbf{Baselines}. Bayesian propagation, interval arithmetic, SAUP--style statistical propagation, and ablations without governance or provenance \cite{Zhao2025}.\\
+\textbf{Metrics}. Bound validity and tightness, expected calibration error, decision utility under policy thresholds, and audit reconstruction success rate.\\
+\textbf{Ablations}. Remove $\mathsf{Catch}_\alpha$, remove $\mathsf{Flip}$, and remove $\rho$ to quantify each component's contribution.
+
+\section{Limitations and Threats to Validity}
+N/U trades completeness for determinism. Algebraic bounds may be conservative in some domains. Operator design must match domain semantics to avoid mismatch between $u$ and real error. Governance thresholds can induce early halts that reduce utility if set poorly. These risks are measurable within the evaluation protocol above.
+
+\section{Conclusion}
+N/U proposes an algebra that couples uncertainty propagation with built--in governance and provenance. Literature in AI governance, uncertainty quantification, and logic points to a gap that this integration can fill. The hypothesis and protocol presented here allow independent falsification or confirmation.
+
+\section*{References}
+\begin{thebibliography}{10}
+
+\bibitem{Mezzi2024}
+Mezzi et al., ``Formal methods for propagating uncertainty in AI--augmented security pipelines,'' \emph{Risk Analysis}, 2024. \\
+\url{https://onlinelibrary.wiley.com/doi/pdf/10.1111/risa.70059}.
+
+\bibitem{Zhao2025}
+Zhao et al., ``SAUP: Step--wise uncertainty propagation for LLM agents,'' in \emph{Proc. ACL}, 2025. \\
+\url{https://aclanthology.org/2025.acl-long.302/}.
+
+\bibitem{IIA2024}
+The Institute of Internal Auditors, ``AI Auditing Framework,'' Sept. 2024. \\
+\url{https://www.theiia.org/globalassets/site/content/tools/professional/aiframework-sept-2024-update.pdf}.
+
+\bibitem{IBM2025}
+IBM, ``AI Audit: explainability and traceability under the EU AI Act and NIST RMF,'' 2025. \\
+\url{https://www.ibm.com/think/topics/ai-audit}.
+
+\bibitem{NASA2023}
+NASA, ``Uncertainty Quantification Mini Tutorial,'' 2023. \\
+\url{https://ntrs.nasa.gov/api/citations/20230005909/downloads/DATAWorks_UQ_mini-tutorial_2023%20v2.pdf}.
+
+\bibitem{Padilla2022}
+Padilla, Kay, and Hullman, ``Uncertainty Visualization,'' 2022. \\
+\url{http://space.ucmerced.edu/Downloads/publications/Uncertainty_Visualization_Padilla_Kay_Hullman_2022.pdf}.
+
+\bibitem{Ruspini2004}
+Ruspini, ``Epistemic probability and logic,'' in \emph{Springer Handbook chapter}, 2004. \\
+\url{https://link.springer.com/content/pdf/10.1007/978-3-540-44792-4_17.pdf}.
+
+\bibitem{VanEijck2023}
+van Eijck, ``Epistemic probability logic lecture notes,'' 2023. \\
+\url{https://staff.fnwi.uva.nl/d.j.n.vaneijck2/papers/14/pdfs/EPLS.pdf}.
+
+\bibitem{Yan2025}
+Yan et al., ``Neutrosophic d--Algebra,'' 2025. \\
+\url{https://fs.unm.edu/NSS/41Algebraic.pdf}.
+
+\bibitem{Alali2025}
+Alali et al., ``Interval--valued intuitionistic fuzzy filters in hoop algebras,'' \emph{Symmetry}, 2025. \\
+\url{https://www.mdpi.com/2073-8994/17/9/1411}.
+
+\end{thebibliography}
+
+\end{document}

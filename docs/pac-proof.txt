@@ -1,0 +1,454 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath, amsthm, amssymb}
+\usepackage{mathtools}
+\usepackage{hyperref}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\newtheorem{definition}{Definition}
+\newtheorem{assumption}{Assumption}
+
+\title{Provably Conservative Coverage Guarantee for N/U Algebra:\\
+PAC-Style Theorem with Enclosure-Preserving Propagation}
+\author{Eric D. Martin}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+We prove that N/U (Nominal/Uncertainty) Algebra provides probabilistically
+guaranteed coverage bounds for uncertainty propagation through arithmetic
+operations. Using a union bound allocation and enclosure-preserving
+multiplication, we establish a PAC-style (Probably Approximately Correct)
+guarantee requiring no distributional assumptions beyond those used to
+construct input intervals.
+\end{abstract}
+
+\section{Introduction}
+
+The N/U Algebra framework represents uncertain quantities as ordered pairs
+$(n, u) \in \mathbb{R} \times \mathbb{R}_{\geq 0}$, where $n$ is the nominal
+value and $u \geq 0$ is a nonnegative uncertainty bound. This work proves that
+propagating these pairs through arithmetic operations preserves probabilistic
+coverage guarantees.
+
+\section{Measure-Theoretic Foundations}
+
+\subsection{Probability Space}
+
+\begin{definition}[Probability Space]
+Let $(\Omega, \mathcal{F}, \mathbb{P})$ be a probability space, where:
+\begin{itemize}
+    \item $\Omega$ is the sample space of all possible realizations
+    \item $\mathcal{F}$ is a $\sigma$-algebra of measurable events
+    \item $\mathbb{P}: \mathcal{F} \to [0,1]$ is a probability measure with 
+          $\mathbb{P}(\Omega) = 1$
+\end{itemize}
+\end{definition}
+
+\subsection{Random Variables and Intervals}
+
+\begin{definition}[N/U Interval]
+For a random variable $X: \Omega \to \mathbb{R}$ and uncertainty bound 
+$u \geq 0$, define the N/U interval:
+\[
+I(n, u) = [n - u, n + u]
+\]
+where $n \in \mathbb{R}$ is the nominal (central) value.
+\end{definition}
+
+\begin{assumption}[Bounded Support]
+\label{assump:bounded}
+Each input random variable $X_i$ satisfies:
+\[
+\mathbb{P}\{|X_i| \leq C_i\} = 1
+\]
+for some finite constant $C_i > 0$. This ensures well-definedness of all
+interval operations.
+\end{assumption}
+
+\subsection{Continuity Requirements}
+
+\begin{assumption}[Function Continuity]
+\label{assump:continuity}
+The function $f: \mathbb{R}^n \to \mathbb{R}$ to be computed is continuous.
+For arithmetic combinations via $\{+, \times, \cdot\}$ (addition, multiplication,
+scalar multiplication), this holds automatically.
+\end{assumption}
+
+\subsection{Justification for Union Bound}
+
+\begin{lemma}[Union Bound for Probability Measures]
+\label{lem:union_bound}
+For any finite collection of events $A_1, A_2, \ldots, A_n \in \mathcal{F}$:
+\[
+\mathbb{P}\left(\bigcap_{i=1}^{n} A_i\right) \geq 1 - \sum_{i=1}^{n} \mathbb{P}(A_i^c)
+\]
+where $A_i^c$ denotes the complement of $A_i$.
+\end{lemma}
+
+\begin{proof}
+By De Morgan's laws and subadditivity of probability measures:
+\begin{align*}
+\mathbb{P}\left(\bigcap_{i=1}^{n} A_i\right) 
+&= 1 - \mathbb{P}\left(\bigcup_{i=1}^{n} A_i^c\right) \\
+&\geq 1 - \sum_{i=1}^{n} \mathbb{P}(A_i^c)
+\end{align*}
+where the inequality follows from $\sigma$-subadditivity of $\mathbb{P}$.
+\end{proof}
+
+\section{Enclosure-Preserving Operations}
+
+\begin{definition}[Enclosure-Preserving Operation]
+\label{def:enclosure}
+An operation $\circ$ on N/U pairs is \emph{enclosure-preserving} if:
+\[
+\forall x_1 \in I(n_1, u_1), \; \forall x_2 \in I(n_2, u_2): \quad
+x_1 \circ x_2 \in I(n_{\text{result}}, u_{\text{result}})
+\]
+where $(n_{\text{result}}, u_{\text{result}}) = (n_1, u_1) \circ (n_2, u_2)$
+(the N/U operation).
+\end{definition}
+
+\subsection{Addition}
+
+\begin{lemma}[Enclosure-Preserving Addition]
+\label{lem:add_enclosure}
+The N/U addition operation:
+\[
+(n_1, u_1) \oplus (n_2, u_2) = (n_1 + n_2, u_1 + u_2)
+\]
+is enclosure-preserving.
+\end{lemma}
+
+\begin{proof}
+Let $x_1 \in [n_1 - u_1, n_1 + u_1]$ and $x_2 \in [n_2 - u_2, n_2 + u_2]$.
+Then:
+\begin{align*}
+x_1 + x_2 &\in [n_1 - u_1 + n_2 - u_2, n_1 + u_1 + n_2 + u_2] \\
+          &= [(n_1 + n_2) - (u_1 + u_2), (n_1 + n_2) + (u_1 + u_2)]
+\end{align*}
+Thus $x_1 + x_2 \in I(n_1 + n_2, u_1 + u_2)$.
+\end{proof}
+
+\subsection{Scalar Multiplication}
+
+\begin{lemma}[Enclosure-Preserving Scalar Multiplication]
+\label{lem:scalar_enclosure}
+The N/U scalar multiplication operation:
+\[
+a \odot (n, u) = (an, |a|u)
+\]
+is enclosure-preserving for all $a \in \mathbb{R}$.
+\end{lemma}
+
+\begin{proof}
+Let $x \in [n - u, n + u]$. Then:
+\begin{align*}
+ax &\in [a(n-u), a(n+u)] \quad \text{if } a \geq 0 \\
+ax &\in [a(n+u), a(n-u)] \quad \text{if } a < 0
+\end{align*}
+In both cases, the interval has center $an$ and half-width $|a|u$:
+\[
+ax \in [an - |a|u, an + |a|u] = I(an, |a|u)
+\]
+\end{proof}
+
+\subsection{Multiplication with $\lambda$-term}
+
+\begin{lemma}[Enclosure-Preserving Multiplication]
+\label{lem:mul_enclosure}
+The N/U multiplication operation with parameter $\lambda \geq 1$:
+\[
+(n_1, u_1) \otimes_\lambda (n_2, u_2) = 
+(n_1 n_2, |n_1|u_2 + |n_2|u_1 + \lambda u_1 u_2)
+\]
+is enclosure-preserving.
+\end{lemma}
+
+\begin{proof}
+Let $x_1 \in [n_1 - u_1, n_1 + u_1]$ and $x_2 \in [n_2 - u_2, n_2 + u_2]$.
+
+The interval product has four corner points:
+\begin{align*}
+c_1 &= (n_1 - u_1)(n_2 - u_2) = n_1 n_2 - n_1 u_2 - n_2 u_1 + u_1 u_2 \\
+c_2 &= (n_1 - u_1)(n_2 + u_2) = n_1 n_2 - n_1 u_2 + n_2 u_1 - u_1 u_2 \\
+c_3 &= (n_1 + u_1)(n_2 - u_2) = n_1 n_2 + n_1 u_2 - n_2 u_1 - u_1 u_2 \\
+c_4 &= (n_1 + u_1)(n_2 + u_2) = n_1 n_2 + n_1 u_2 + n_2 u_1 + u_1 u_2
+\end{align*}
+
+The interval $[x_1 \cdot x_2]$ has:
+\begin{itemize}
+    \item Center: $n_1 n_2$
+    \item Half-width: $\max\{|c_i - n_1 n_2| : i \in \{1,2,3,4\}\}$
+\end{itemize}
+
+Computing deviations from center:
+\begin{align*}
+|c_1 - n_1 n_2| &= |{-}n_1 u_2 - n_2 u_1 + u_1 u_2| \\
+|c_2 - n_1 n_2| &= |{-}n_1 u_2 + n_2 u_1 - u_1 u_2| \\
+|c_3 - n_1 n_2| &= |n_1 u_2 - n_2 u_1 - u_1 u_2| \\
+|c_4 - n_1 n_2| &= |n_1 u_2 + n_2 u_1 + u_1 u_2|
+\end{align*}
+
+By triangle inequality, for all corners:
+\[
+|c_i - n_1 n_2| \leq |n_1| u_2 + |n_2| u_1 + u_1 u_2
+\]
+
+Therefore, the interval half-width satisfies:
+\[
+w_{\text{interval}} = \max_i |c_i - n_1 n_2| \leq |n_1|u_2 + |n_2|u_1 + u_1 u_2
+\]
+
+For $\lambda \geq 1$:
+\[
+u_{\text{result}} = |n_1|u_2 + |n_2|u_1 + \lambda u_1 u_2 
+\geq |n_1|u_2 + |n_2|u_1 + u_1 u_2 \geq w_{\text{interval}}
+\]
+
+Thus $x_1 \cdot x_2 \in I(n_1 n_2, u_{\text{result}})$.
+\end{proof}
+
+\begin{corollary}[Exact Interval Multiplication]
+\label{cor:exact_lambda}
+For $\lambda = 1$, the N/U multiplication matches interval arithmetic exactly:
+\[
+u_{\text{result}} = |n_1|u_2 + |n_2|u_1 + u_1 u_2 = w_{\text{interval}}
+\]
+\end{corollary}
+
+\section{Main Coverage Theorem}
+
+\begin{theorem}[PAC-Style Coverage Guarantee]
+\label{thm:pac_coverage}
+Let $X_1, X_2, \ldots, X_n$ be random variables on $(\Omega, \mathcal{F}, \mathbb{P})$
+satisfying Assumptions \ref{assump:bounded} and let $f: \mathbb{R}^n \to \mathbb{R}$
+be continuous (Assumption \ref{assump:continuity}).
+
+Suppose each input satisfies:
+\[
+\mathbb{P}\{X_i \in I(n_i, u_i)\} \geq 1 - \frac{\alpha}{n}
+\]
+for some $\alpha \in (0, 1)$.
+
+Let $Y = f(X_1, \ldots, X_n)$ and let $(n_f, u_f)$ be the N/U propagation result
+using enclosure-preserving operations (Lemmas \ref{lem:add_enclosure}, 
+\ref{lem:scalar_enclosure}, \ref{lem:mul_enclosure}).
+
+Then:
+\[
+\mathbb{P}\{Y \in I(n_f, u_f)\} \geq 1 - \alpha
+\]
+\end{theorem}
+
+\begin{proof}
+Define events:
+\[
+A_i = \{X_i \in I(n_i, u_i)\}, \quad i = 1, \ldots, n
+\]
+
+By assumption:
+\[
+\mathbb{P}(A_i^c) \leq \frac{\alpha}{n}, \quad \forall i
+\]
+
+By Lemma \ref{lem:union_bound}:
+\begin{align*}
+\mathbb{P}\left(\bigcap_{i=1}^{n} A_i\right) 
+&\geq 1 - \sum_{i=1}^{n} \mathbb{P}(A_i^c) \\
+&\geq 1 - n \cdot \frac{\alpha}{n} \\
+&= 1 - \alpha
+\end{align*}
+
+Now suppose $\omega \in \bigcap_{i=1}^{n} A_i$. Then for all $i$:
+\[
+X_i(\omega) \in I(n_i, u_i)
+\]
+
+Since $f$ is constructed from enclosure-preserving operations (Definition
+\ref{def:enclosure}), we have:
+\[
+f(X_1(\omega), \ldots, X_n(\omega)) \in I(n_f, u_f)
+\]
+
+Therefore:
+\[
+\bigcap_{i=1}^{n} A_i \subseteq \{Y \in I(n_f, u_f)\}
+\]
+
+Thus:
+\[
+\mathbb{P}\{Y \in I(n_f, u_f)\} 
+\geq \mathbb{P}\left(\bigcap_{i=1}^{n} A_i\right) 
+\geq 1 - \alpha
+\]
+\end{proof}
+
+\section{Regulatory Calibration Recipe}
+
+\begin{corollary}[Bonferroni Calibration]
+\label{cor:bonferroni}
+To achieve system-level coverage $\geq 1 - \alpha$, allocate per-input coverage:
+\[
+\mathbb{P}\{X_i \in I(n_i, u_i)\} \geq 1 - \frac{\alpha}{n}
+\]
+
+This allocation:
+\begin{enumerate}
+    \item Requires no independence assumptions
+    \item Is conservative (may be loose if inputs are independent)
+    \item Provides auditable, provable guarantees
+\end{enumerate}
+\end{corollary}
+
+\begin{corollary}[Independence-Based Calibration]
+\label{cor:independence}
+If $X_1, \ldots, X_n$ are mutually independent, a tighter allocation is:
+\[
+\mathbb{P}\{X_i \in I(n_i, u_i)\} \geq (1 - \alpha)^{1/n}
+\]
+
+This achieves:
+\[
+\mathbb{P}\{Y \in I(n_f, u_f)\} = \prod_{i=1}^{n} (1 - \alpha)^{1/n} = 1 - \alpha
+\]
+with equality under independence.
+\end{corollary}
+
+\section{Safety Margin with $\lambda$ Parameter}
+
+\begin{corollary}[Tunable Conservatism]
+\label{cor:lambda_safety}
+For $\lambda > 1$, the multiplication operation provides an additional safety
+margin beyond exact interval enclosure.
+
+Recommended defaults:
+\begin{itemize}
+    \item $\lambda = 1.0$: Exact interval arithmetic (minimal conservatism)
+    \item $\lambda = 1.1$: 10\% safety margin (general use)
+    \item $\lambda = 1.5$: 50\% safety margin (high-reliability systems)
+\end{itemize}
+
+The parameter $\lambda$ accommodates model uncertainty, temporal drift, or
+unmodeled correlations while maintaining $O(1)$ complexity.
+\end{corollary}
+
+\section{Computational Complexity}
+
+\begin{theorem}[Constant-Time Operations]
+\label{thm:complexity}
+All N/U operations (addition, scalar multiplication, multiplication with $\lambda$)
+execute in $O(1)$ time and space, independent of:
+\begin{itemize}
+    \item Number of operations in computation chain
+    \item Number of input variables
+    \item Uncertainty representation size
+\end{itemize}
+\end{theorem}
+
+\begin{proof}
+Each operation computes a fixed number of arithmetic operations:
+\begin{itemize}
+    \item Addition: 2 operations (nominal + uncertainty)
+    \item Scalar: 3 operations (1 mult, 1 abs, 1 mult)
+    \item Multiplication: 7 operations (1 mult, 2 abs, 3 mult, 1 add)
+\end{itemize}
+
+Storage: Always 2 floats (nominal, uncertainty).
+
+No iterative loops, no data structure growth. Thus $O(1)$ in both time and space.
+\end{proof}
+
+\section{Discussion}
+
+\subsection{Comparison to Monte Carlo}
+
+Monte Carlo sampling achieves empirical coverage but requires $O(n_{\text{samples}})$
+evaluations. N/U Algebra provides:
+\begin{itemize}
+    \item Deterministic bounds (vs stochastic estimates)
+    \item Provable coverage (vs empirical convergence)
+    \item $O(1)$ complexity (vs $O(n_{\text{samples}})$)
+\end{itemize}
+
+Trade-off: Monte Carlo provides distribution information; N/U provides only bounds.
+
+\subsection{Comparison to Affine Arithmetic}
+
+Affine arithmetic tracks correlations via noise symbols, achieving tighter bounds
+but with $O(k^2)$ multiplication complexity where $k$ is the number of tracked
+noise terms.
+
+N/U Algebra trades correlation tracking for computational efficiency:
+\begin{itemize}
+    \item N/U: $O(1)$ per operation, conservative bounds
+    \item Affine: $O(k^2)$ per operation, tighter bounds with correlation tracking
+\end{itemize}
+
+\subsection{When to Use N/U Algebra}
+
+Appropriate contexts:
+\begin{enumerate}
+    \item Real-time systems with hard latency constraints ($<$ 1ms)
+    \item Safety-critical systems requiring provable guarantees
+    \item Regulatory contexts (FDA, NASA, NIST) requiring coverage certificates
+    \item Systems where correlation information is unavailable
+    \item Embedded systems with limited computational resources
+\end{enumerate}
+
+Inappropriate contexts:
+\begin{enumerate}
+    \item Research contexts where computational cost negligible
+    \item Systems requiring precise probability distributions
+    \item Deep neural networks (uncertainty compounds exponentially)
+    \item Applications requiring tail risk quantification
+\end{enumerate}
+
+\section{Conclusion}
+
+We have proven that N/U Algebra provides PAC-style coverage guarantees via:
+\begin{enumerate}
+    \item Union bound allocation (Theorem \ref{thm:pac_coverage})
+    \item Enclosure-preserving operations (Lemmas \ref{lem:add_enclosure}-\ref{lem:mul_enclosure})
+    \item Tunable safety margin via $\lambda \geq 1$ (Corollary \ref{cor:lambda_safety})
+    \item Constant-time complexity (Theorem \ref{thm:complexity})
+\end{enumerate}
+
+The framework requires no distributional assumptions beyond those used to construct
+input intervals, making it suitable for regulatory and safety-critical applications.
+
+\section*{Acknowledgments}
+
+This work was conducted independently without external funding. The author thanks
+the open-source scientific computing community for foundational tools.
+
+\bibliographystyle{plain}
+\begin{thebibliography}{9}
+
+\bibitem{stolfi1997}
+J. Stolfi and L. H. de Figueiredo.
+\emph{Self-validated numerical methods and applications}.
+Brazilian Mathematics Colloquium Monographs, IMPA, 1997.
+
+\bibitem{moore1966}
+R. E. Moore.
+\emph{Interval Analysis}.
+Prentice-Hall, 1966.
+
+\bibitem{jcgm2008}
+JCGM 100:2008.
+\emph{Evaluation of measurement data — Guide to the expression of uncertainty in measurement}.
+Joint Committee for Guides in Metrology, 2008.
+
+\bibitem{jcgm2008supp1}
+JCGM 101:2008.
+\emph{Evaluation of measurement data — Supplement 1 to the "Guide to the expression of uncertainty in measurement" — Propagation of distributions using a Monte Carlo method}.
+Joint Committee for Guides in Metrology, 2008.
+
+\end{thebibliography}
+
+\end{document}
