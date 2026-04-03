@@ -1,0 +1,588 @@
+Nominal/Uncertainty Algebra as a Conservative Companion Method for Psychology
+Prepared for peer‑review submission
+
+Materials verification (Sanity Guard)
+
+All N/U sources required for this manuscript are present in the project workspace and were used as the basis for definitions, rules, and invariants: The NASA Paper and Small Falcon Algebra (Martin, 2025) (PDF) and the N/U validation ledgers/CSVs (e.g., addition_sweep.csv, product_sweep.csv) with accompanying project summary and README.
+
+Abstract
+
+Psychological science routinely aggregates information, rescales variables, builds composite indices, and pools evidence across studies. Yet the discipline still lacks a standardized, assumption‑light method for tracking how uncertainty moves through the arithmetic steps that underlie nearly every analysis: adding and subtracting means, multiplying by scalars to rescale, forming indices and weighted composites, and aggregating across studies. Existing approaches either (a) assume distributional forms and rely on variance algebra (e.g., Gaussian error propagation; inverse‑variance meta‑analysis), or (b) rely on model‑based inferential machinery that makes uncertainty accounting sensitive to prior specification and publication bias. 
+BMJ Open
++4
+Cochrane
++4
+Europe PMC
++4
+ This manuscript introduces and motivates Nominal/Uncertainty Algebra (N/U)—a conservative algebra on ordered pairs (n, u) with transparent rules for addition, multiplication, and linear transforms, plus two operators (Flip, Catch) that conservatively preserve error envelopes—anchored to a single formal source: The NASA Paper and Small Falcon Algebra (Martin, 2025). We show how N/U provides a companion robustness panel for core psychological practices (contrasts, composites, transforms, meta‑analysis), complementing frequentist, Bayesian, and meta‑scientific checks while remaining stable under model misspecification and publication‑bias stress tests. 
+Wiley Online Library
++2
+SpringerLink
++2
+ We outline applications on open datasets (Many Labs 2, OpAQ Anchoring Quest, psymetadata), and conclude with a reporting template that integrates N/U ledgers with existing standards. 
+SAGE Journals
++1
+
+1. Introduction: The need for robust uncertainty propagation
+
+Across subfields, psychology’s empirical claims depend on arithmetic: researchers sum item scores into scales, rescale outcomes, compute contrasts, and pool effect sizes across studies. The epistemic status of these operations rests on how error is propagated, yet standard practice either presumes Gaussian errors (so that variances add and scale in familiar ways) or relies on model‑based pooling where heterogeneity and small‑study effects can dominate conclusions. 
+Cochrane
++2
+Europe PMC
++2
+ Contemporary meta‑science has made the stakes clear: replication audit projects and many‑analysts demonstrations show that reasonable analysis choices can yield materially different conclusions from the same data, which implies that uncertainty lives inside our arithmetic as much as inside our models. 
+Science
++1
+
+N/U algebra addresses this gap by providing a deliberately conservative, assumption‑light ledger that tracks numerical values alongside honest uncertainty budgets at each arithmetic step—without committing to specific distributional forms or hierarchical priors. The approach is aligned in spirit with long‑standing engineering standards (e.g., GUM) and interval‑analysis traditions that prefer transparent error bounds when assumptions are fragile. 
+BIPM
++1
+ It is intended not to supplant frequentist or Bayesian inference, but to stand beside them as a robustness panel that is stable under model changes and publication‑bias diagnostics. 
+Wiley Online Library
++1
+
+2. Current Practices in Psychology: How uncertainty is propagated
+2.1 Frequentist machinery
+
+In the frequentist paradigm, uncertainty is often treated via confidence intervals based on sampling distributions and—when combining evidence across studies—inverse‑variance weighted fixed‑ or random‑effects meta‑analysis. 
+Cochrane
+ The field’s canonical references outline heterogeneity quantification using Cochran’s Q, τ² (between‑study variance), and I² (proportion of variance due to heterogeneity), with best practices evolving toward prediction intervals that express dispersion in future settings. 
+Europe PMC
++1
+ Random‑effects estimation has long relied on DerSimonian–Laird estimators, though re‑analyses recommend Hartung–Knapp–Sidik–Jonkman adjustments for more reliable uncertainty with few or uneven studies. 
+ScienceDirect
++1
+ Uncertainty about publication and related biases is commonly examined via funnel plots, Egger’s regression for asymmetry, and “trim‑and‑fill” procedures. 
+BMJ
++1
+
+2.2 Bayesian machinery
+
+Bayesian workflows contribute evidence quantification (Bayes factors), hierarchical partial pooling, and principled prior incorporation, with accessible expositions and software enabling routine use in psychology. 
+sites.stat.washington.edu
++1
+ For ANOVA‑like designs and general linear models, default Bayes factors are widely documented, and meta‑analytic practice has matured to use empirical priors on heterogeneity and model‑averaging across publication‑bias scenarios (e.g., RoBMA). 
+cpb-us-e2.wpmucdn.com
++2
+Journal of Open Psychology Data
++2
+ These strengths come with sensitivities—priors, selection models, and small‑k behavior—that can change inferences under modest analytic perturbations, motivating complementary assumption‑light checks. 
+Wiley Online Library
+
+2.3 Meta‑science and robustness
+
+Methodological reforms (Registered Reports), diagnostic tools (p‑curve), and design‑analysis paradigms (multiverse analyses; many‑analysts projects) target analytic flexibility and bias. 
+Psychology Department at UBC
++3
+Europe PMC
++3
+UC San Diego Pages
++3
+ Large‑scale replication efforts have documented substantial variability across settings, further underscoring the need for uncertainty tracking that survives modeling choices and analyst degrees of freedom. 
+Science
+
+3. N/U Algebra: Formalization (Anchor Standard)
+
+We adopt The NASA Paper and Small Falcon Algebra (Martin, 2025) as the single source of truth for definitions, rules, proofs, and invariants. Each quantity is represented as an ordered pair 
+(
+𝑛
+,
+𝑢
+)
+(n,u), where 
+𝑛
+n is the nominal (point) value and 
+𝑢
+≥
+0
+u≥0 is a conservative, distribution‑agnostic uncertainty budget that upper‑bounds error at a chosen level of conservatism.
+
+Core rules (selected):
+
+Addition / subtraction: 
+(
+𝑛
+1
+,
+𝑢
+1
+)
+⊕
+(
+𝑛
+2
+,
+𝑢
+2
+)
+=
+(
+𝑛
+1
+±
+𝑛
+2
+,
+  
+𝑢
+1
++
+𝑢
+2
+)
+(n
+1
+	​
+
+,u
+1
+	​
+
+)⊕(n
+2
+	​
+
+,u
+2
+	​
+
+)=(n
+1
+	​
+
+±n
+2
+	​
+
+,u
+1
+	​
+
++u
+2
+	​
+
+). Summed uncertainty is linear to avoid under‑reporting when dependence is unknown.
+
+Scalar multiplication / linear transforms: for scalar 
+𝑎
+a, 
+𝑎
+⊙
+(
+𝑛
+,
+𝑢
+)
+=
+(
+𝑎
+𝑛
+,
+  
+∣
+𝑎
+∣
+ 
+𝑢
+)
+a⊙(n,u)=(an,∣a∣u); for affine transform 
+𝑎
+𝑋
++
+𝑏
+aX+b, propagate as 
+(
+𝑎
+𝑛
++
+𝑏
+,
+  
+∣
+𝑎
+∣
+ 
+𝑢
+)
+(an+b,∣a∣u).
+
+Product: 
+(
+𝑛
+1
+,
+𝑢
+1
+)
+⊗
+(
+𝑛
+2
+,
+𝑢
+2
+)
+=
+(
+𝑛
+1
+𝑛
+2
+,
+  
+∣
+𝑛
+2
+∣
+𝑢
+1
++
+∣
+𝑛
+1
+∣
+𝑢
+2
++
+𝑢
+1
+𝑢
+2
+)
+(n
+1
+	​
+
+,u
+1
+	​
+
+)⊗(n
+2
+	​
+
+,u
+2
+	​
+
+)=(n
+1
+	​
+
+n
+2
+	​
+
+,∣n
+2
+	​
+
+∣u
+1
+	​
+
++∣n
+1
+	​
+
+∣u
+2
+	​
+
++u
+1
+	​
+
+u
+2
+	​
+
+), the last term covering worst‑case interaction.
+
+Flip 
+𝐵
+B: swap nominal/uncertainty to stress‑test inference, 
+𝐵
+(
+𝑛
+,
+𝑢
+)
+=
+(
+𝑢
+,
+∣
+𝑛
+∣
+)
+B(n,u)=(u,∣n∣).
+
+Catch 
+𝐶
+C: collapse nominal to zero while banking all exposure into the budget, 
+𝐶
+(
+𝑛
+,
+𝑢
+)
+=
+(
+0
+,
+∣
+𝑛
+∣
++
+𝑢
+)
+C(n,u)=(0,∣n∣+u).
+
+Invariants proven in the NASA paper include monotonicity (uncertainty never decreases under arithmetic composition), conservatism (error envelopes do not shrink under unknown dependence), stability (order‑insensitivity for sums/products), and transparency (ledger decomposability across steps). These choices echo metrology’s GUM philosophy (track budgets without fragile distributional commitments) and interval‑analysis safeguards (bound arithmetic under ignorance). 
+BIPM
++1
+
+The project README and summary describe validation sweeps (e.g., addition_sweep.csv, product_sweep.csv) that check algebraic identities and boundary behavior across grids of inputs, confirming rule invariants numerically.
+
+4. Complementary Value: Using N/U as a robustness panel
+4.1 Contrasts and rescaling
+
+In ANOVA‑style contrasts and simple rescaling (e.g., converting milliseconds to standardized units), N/U’s linear transform rule tracks how each step affects the budget, creating an auditable ledger independent of distributional assumptions. This complements frequentist CIs (which assume a sampling model) and Bayesian posteriors (which assume priors) by exhibiting the arithmetic footprint of every transform. 
+Cochrane
++1
+
+4.2 Composite scores and weighted indices
+
+Psychology often builds scales (sum scores) or weighted composites (e.g., factor‑score–like indices). An N/U ledger shows exactly how adding items or applying weights inflates or compresses budgets, guarding against illusory precision in long indices. When composites feed a meta‑analysis, the ledger interfaces naturally with traditional pooling by making the pre‑meta arithmetic explicit. 
+Cochrane
+
+4.3 Meta‑analysis
+
+N/U can run in parallel to a random‑effects meta‑analysis: each study’s effect becomes 
+(
+𝜃
+^
+𝑖
+,
+𝑢
+𝑖
+)
+(
+θ
+^
+i
+	​
+
+,u
+i
+	​
+
+) with 
+𝑢
+𝑖
+u
+i
+	​
+
+ set conservatively (e.g., combining within‑study error and design risk). Ledger‑based pooling (sums and scalar multiples) yields a conservative bracket on the grand mean that can be juxtaposed with inverse‑variance CIs, prediction intervals, and publication‑bias models (Egger, trim‑and‑fill; RoBMA). Agreement across panels strengthens conclusions; divergence flags model sensitivity. 
+Wiley Online Library
++4
+Cochrane
++4
+BMJ Open
++4
+
+4.4 Transform‑heavy pipelines and multiverse diagnostics
+
+In multiverse analyses or many‑analysts projects, conclusions shift as pipelines change. An N/U ledger—because it tracks uncertainty through every arithmetic branch—shows where budgets balloon and which forks dominate fragility, complementing p‑curve/multiverse reports with a mechanistic, stepwise error account. 
+SAGE Journals
++1
+
+5. Applications with Open Datasets
+
+We sketch how an N/U robustness panel would sit alongside standard analyses:
+
+Many Labs 2 (ML2). Protocol‑vetted, preregistered replications across 125 samples and >15,000 participants test generalizability of classic findings. For each effect, maintain an N/U ledger at the site level (contrast → rescaling → composite) and pool conservatively across sites next to random‑effects estimates and prediction intervals; divergence spotlights heterogeneity patterns. 
+SAGE Journals
+
+Open Anchoring Quest (OpAQ). Item‑level, multi‑study anchoring dataset. Build per‑item ledgers for anchored estimates before forming study‑level composites; then contrast N/U brackets with selection‑model–adjusted Bayesian meta‑analysis (RoBMA) to quantify sensitivity to publication bias. 
+Journal of Open Psychology Data
++1
+
+psymetadata. A corpus of psychological effect sizes and metadata. Use N/U to audit pre‑meta arithmetic (e.g., standardized mean differences assembled from raw means/SDs) before conventional pooling; differences between N/U envelopes and inverse‑variance CIs indicate where preprocessing, not pooling, drives uncertainty.
+
+6. Reporting Standard: A methods appendix for Registered Reports and preregistrations
+
+We recommend appending an N/U ledger to each analysis pipeline:
+
+Ledger granularity. Record every arithmetic step (sum, difference, scaling, product), with the resulting 
+(
+𝑛
+,
+𝑢
+)
+(n,u) pair and a brief rationale for the chosen 
+𝑢
+u.
+
+Panel display. Report standard CIs/p‑values or Bayes factors alongside the final N/U bracket; in meta‑analyses, include prediction intervals and publication‑bias diagnostics (Egger, trim‑and‑fill, RoBMA). 
+Wiley Online Library
++3
+BMJ Open
++3
+BMJ
++3
+
+Decision language. Avoid thresholded claims; synthesize the panel (CI, posterior, N/U bracket) and contextual factors per contemporary guidance. 
+Error Statistics Philosophy
+
+Preregistration fit. Ledger templates fit cleanly with Registered Reports by fixing error‑budget rules a priori, improving transparency of transform‑heavy pipelines. 
+Europe PMC
+
+7. Limitations and scope
+
+N/U is conservative by design; brackets may be wider than model‑based intervals. That is a feature when dependence is unknown or when multiverse choices multiply. Where measurement models are well‑validated and assumptions hold, traditional inferential machinery may provide tighter (but assumption‑dependent) intervals; the point of the companion panel is to expose that dependence. 
+Cochrane
+ N/U also does not replace construct validation or measurement theory; it complements them by making the arithmetic of scores and transforms auditable. 
+BIPM
+
+8. Conclusion
+
+N/U algebra adds a missing piece to psychology’s evidence workflow: an assumption‑light, conservative, and transparent arithmetic ledger that travels with the data from raw numbers to inferential summaries, sits comfortably beside frequentist and Bayesian tools, and communicates where uncertainty actually enters our numbers.
+N/U algebra is prepared to serve as a conservative companion method in psychology, ensuring transparency and robustness.
+
+References (APA‑style)
+
+Anchor and N/U resources
+
+Martin, R. (2025). The NASA Paper and Small Falcon Algebra. Project white paper and validation ledgers.
+
+Project README and summary files. (2025). N/U Algebra in Research Psychology (materials inventory; validation grids).
+
+Frequentist uncertainty & meta‑analysis
+
+Borenstein, M., Hedges, L. V., Higgins, J. P. T., & Rothstein, H. (2009). Introduction to meta‑analysis. Wiley. 
+meta-analysis.com
++1
+
+Cochrane Handbook for Systematic Reviews of Interventions. (current version). Cochrane. (Chs. 6 & 10). 
+Cochrane
++2
+Cochrane
++2
+
+DerSimonian, R., & Laird, N. (1986). Meta‑analysis in clinical trials. Controlled Clinical Trials, 7, 177–188. 
+ScienceDirect
++1
+
+Duval, S., & Tweedie, R. (2000). Trim and fill: A simple funnel‑plot‑based method. Biometrics, 56, 455–463. 
+OUP Academic
+
+Egger, M., Davey Smith, G., Schneider, M., & Minder, C. (1997). Bias in meta‑analysis detected by a simple, graphical test. BMJ, 315, 629–634. 
+BMJ
++1
+
+Higgins, J. P. T., & Thompson, S. G. (2002). Quantifying heterogeneity in a meta‑analysis. Statistics in Medicine, 21, 1539–1558. 
+Europe PMC
+
+IntHout, J., Ioannidis, J. P. A., & Borm, G. F. (2014). The Hartung–Knapp–Sidik–Jonkman method for random‑effects meta‑analysis. BMC Medical Research Methodology, 14, 25. 
+monash.primo.exlibrisgroup.com
+
+Sterne, J. A. C., Gavaghan, D., & Egger, M. (2000). Publication and related bias in meta‑analysis: Power of statistical tests and prevalence in the literature. Journal of Clinical Epidemiology, 53, 1119–1129. (Background on funnel plots/small‑study effects). 
+SAGE Journals
+
+IntHout, J., et al. (2016). Plea for routinely presenting prediction intervals in meta‑analysis. BMJ Open, 6, e010247. 
+BMJ Open
+
+Bayesian psychology/meta‑analysis
+
+Kass, R. E., & Raftery, A. E. (1995). Bayes factors. Journal of the American Statistical Association, 90, 773–795. 
+sites.stat.washington.edu
++1
+
+Rouder, J. N., Morey, R. D., Speckman, P. L., & Province, J. M. (2012). Default Bayes factors for ANOVA designs. Journal of Mathematical Psychology, 56, 356–374. 
+cpb-us-e2.wpmucdn.com
+
+Wagenmakers, E.‑J., Marsman, M., Jamil, T., et al. (2018). Bayesian inference for psychology, Part I. Psychonomic Bulletin & Review, 25, 35–57. 
+SpringerLink
+
+van Erp, S., et al. (2017). Estimates of between‑study heterogeneity for 705 meta‑analyses in Psychological Bulletin. Journal of Open Psychology Data, 5, 4. (Empirical priors). 
+Journal of Open Psychology Data
++1
+
+Bartoš, F., Maier, M., Quintana, D. S., & Wagenmakers, E.‑J. (2022). Robust Bayesian meta‑analysis (RoBMA) and selection models (tutorial & software). Advances in Methods and Practices in Psychological Science. (See RoBMA package docs). 
+CRAN
++1
+
+Maier, M., Bartoš, F., et al. (2023). Robust Bayesian meta‑analysis: Model‑averaging across complementary publication‑bias models. Research Synthesis Methods. 
+Wiley Online Library
+
+Robustness & meta‑science
+
+Chambers, C. D. (2013). Registered Reports: A new publishing initiative. Cortex, 49, 609–610. 
+Europe PMC
++1
+
+Gelman, A., & Loken, E. (2014). The garden of forking paths. American Scientist, 102, 460–466. 
+psychology.mcmaster.ca
+
+McShane, B. B., Gal, D., Gelman, A., Robert, C., & Tackett, J. L. (2019). Abandon statistical significance. The American Statistician, 73(Suppl. 1), 235–245. 
+WRAP
+
+Silberzahn, R., et al. (2018). Many analysts, one dataset. PNAS, 115, 12684–12689. 
+Psychology Department at UBC
+
+Simonsohn, U., Nelson, L. D., & Simmons, J. P. (2014). p‑Curve. Journal of Experimental Psychology: General, 143, 534–547. 
+UC San Diego Pages
+
+Steegen, S., Tuerlinckx, F., Gelman, A., & Vanpaemel, W. (2016). Increasing transparency through multiverse analysis. Perspectives on Psychological Science, 11, 702–712. 
+SAGE Journals
+
+Open Science Collaboration. (2015). Estimating the reproducibility of psychological science. Science, 349, aac4716. 
+Science
+
+Clinical psychology / IU & decision‑making under uncertainty
+
+Buhr, K., & Dugas, M. J. (2002). The Intolerance of Uncertainty Scale: Psychometric properties. Behaviour Research and Therapy, 40, 931–945. 
+ScienceDirect
++1
+
+Carleton, R. N. (2016). Into the unknown: Contemporary models involving uncertainty. Clinical Psychology Review, 46, 45–56. 
+ScienceDirect
++1
+
+Grupe, D. W., & Nitschke, J. B. (2013). Uncertainty and anticipation in anxiety. Nature Reviews Neuroscience, 14, 488–501. 
+Nature
+
+Robichaud, M., & Dugas, M. J. (2015). Cognitive‑behavioral treatment for GAD: Targeting intolerance of uncertainty. (Protocol expositions). 
+ScienceDirect
++1
+
+Mathematical frameworks for uncertainty quantification
+
+JCGM 100:2008. Guide to the Expression of Uncertainty in Measurement (GUM). BIPM/ISO. 
+BIPM
++1
+
+Moore, R. E., Kearfott, R. B., & Cloud, M. J. (2009). Introduction to interval analysis. SIAM. 
+SIAM Ebooks
+
+Xiu, D., & Karniadakis, G. E. (2002). The Wiener–Askey polynomial chaos for SDEs. SIAM Journal on Scientific Computing, 24, 619–644. 
+sci.utah.edu
+
+Saltelli, A., Ratto, M., Andres, T., et al. (2008). Global sensitivity analysis: The primer. Wiley. 
+Wiley
++1
+
+Datasets / resources for applications
+
+Klein, R. A., Vianello, M., Hasselman, F., et al. (2018). Many Labs 2. AMPPS, 1, 443–490. 
+SAGE Journals
+
+Röseler, L., Weber, L., Helgerth, K., et al. (2022). The Open Anchoring Quest dataset. Journal of Open Psychology Data, 10, 16; Correction (2024). 
+Journal of Open Psychology Data
++1
+
+psymetadata consortium. (2025). psymetadata (research corpus and metadata).

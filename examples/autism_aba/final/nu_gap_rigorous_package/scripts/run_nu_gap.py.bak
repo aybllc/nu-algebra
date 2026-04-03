@@ -1,0 +1,107 @@
+#!/usr/bin/env python3
+import argparse, pandas as pd, numpy as np, random, os
+
+def compute_u(ioa, cf, rf):
+    def c(v):
+        try: v=float(v)
+        except: return 1.0
+        return min(max(v,0.0),1.0)
+    ioa=c(ioa); cf=c(cf); rf=c(rf)
+    u=(1-ioa)+(1-cf)+(1-rf)
+    return min(max(u,0.0),1.0)
+
+def wls_slope(y, t, w):
+    y=np.asarray(y,float); t=np.asarray(t,float); w=np.asarray(w,float)
+    X=np.column_stack([np.ones_like(t), t])
+    WX=X*w[:,None]
+    XtWX=X.T@WX
+    XtWy=X.T@(w*y)
+    beta=np.linalg.pinv(XtWX)@XtWy
+    return float(beta[1])
+
+def weighted_mean(y,w):
+    y=np.asarray(y,float); w=np.asarray(w,float)
+    return float((w*y).sum()/max(w.sum(),1e-12))
+
+def block_stats(df):
+    y=df["metric_value"].astype(float).values
+    t=df["session_index"].astype(float).values
+    u=np.array([compute_u(r.ioa,r.caregiver_fidelity,r.researcher_fidelity) for r in df.itertuples()], float)
+    w=1.0/(u+1e-6)
+    return {"n":weighted_mean(y,w), "beta":wls_slope(y,t,w),
+            "u_mean":float(u.mean() if len(u)>0 else 0.0),
+            "n_points":int(len(y))}
+
+def delta_stats(df):
+    pre=df[df["gap_flag"].str.lower()=="pre"]
+    post=df[df["gap_flag"].str.lower()=="post"]
+    if len(pre)==0 or len(post)==0: return None
+    s_pre=block_stats(pre); s_post=block_stats(post)
+    return {"delta_L":s_post["n"]-s_pre["n"],
+            "delta_T":s_post["beta"]-s_pre["beta"],
+            "u_bar":(s_pre["u_mean"]+s_post["u_mean"])/2.0,
+            "n_pre":s_pre["n_points"], "n_post":s_post["n_points"]}
+
+def run_permutation(df, perms=10000, seed=1337):
+    df=df.sort_values("session_index").copy()
+    pre_n=(df["gap_flag"].str.lower()=="pre").sum()
+    post_n=(df["gap_flag"].str.lower()=="post").sum()
+    if pre_n==0 or post_n==0: return None
+    obs=delta_stats(df)
+    labels=(["pre"]*pre_n)+(["post"]*post_n)
+    n=len(df); rng=random.Random(seed)
+    def compute_for_labels(labs):
+        tmp=df.copy(); tmp["gap_flag"]=labs; d=delta_stats(tmp); return d["delta_L"], d["delta_T"]
+    obs_L,obs_T=obs["delta_L"],obs["delta_T"]
+    stats_L=[]; stats_T=[]
+    for b in range(perms):
+        shift=rng.randrange(1,n-1)
+        labs=labels[-shift:]+labels[:-shift]
+        L,T=compute_for_labels(labs)
+        stats_L.append(L); stats_T.append(T)
+    p_L=(1+sum(1 for v in stats_L if abs(v)>=abs(obs_L)))/(1+perms)
+    p_T=(1+sum(1 for v in stats_T if abs(v)>=abs(obs_T)))/(1+perms)
+    return obs,p_L,p_T
+
+def main():
+    ap=argparse.ArgumentParser()
+    ap.add_argument("--csv", required=True)
+    ap.add_argument("--perms", type=int, default=10000)
+    ap.add_argument("--sesoi_level", type=float, default=0.10)
+    ap.add_argument("--sesoi_slope", type=float, default=0.005)
+    args=ap.parse_args()
+    df=pd.read_csv(args.csv)
+    participants=sorted(df["participant"].unique())
+    rows=[]
+    for p in participants:
+        dfp=df[df["participant"]==p].copy()
+        res=run_permutation(dfp, perms=args.perms, seed=1337)
+        if res is None:
+            rows.append({"participant":p,"note":"insufficient pre/post data"})
+            continue
+        obs,pL,pT=res
+        rows.append({"participant":p,"delta_level":obs["delta_L"],"delta_slope":obs["delta_T"],
+                     "u_bar":obs["u_bar"],"n_pre":obs["n_pre"],"n_post":obs["n_post"],
+                     "p_level":pL,"p_slope":pT})
+    out_dir=os.path.join(os.path.dirname(args.csv),"..","results")
+    os.makedirs(out_dir, exist_ok=True)
+    pd.DataFrame(rows).to_csv(os.path.join(out_dir,"gap_effect_summary.csv"), index=False)
+    L=args.sesoi_level; T=args.sesoi_slope
+    lines=["# Gap‑Effect Decision (N/U weighted)",
+           f"- SESOI: level ±{L}, slope ±{T}/session",
+           f"- Permutations: {args.perms} (circular label shifts)",
+           "", "## Per‑participant"]
+    for r in rows:
+        if "delta_level" in r:
+            decision=("possible_effect" if (abs(r["delta_level"])>L or abs(r["delta_slope"])>T) else "no_detectable_effect")
+            lines.append(f"- {r['participant']}: {decision} "
+                         f"(Δ_L={r['delta_level']:.3f}, Δ_T={r['delta_slope']:.3f}, "
+                         f"p_L={r['p_level']:.3f}, p_T={r['p_slope']:.3f}; "
+                         f"n_pre={r['n_pre']}, n_post={r['n_post']})")
+        else:
+            lines.append(f"- {r.get('participant','?')}: {r.get('note','insufficient data')}")
+    with open(os.path.join(out_dir,"decision.md"),"w") as f:
+        f.write("\n".join(lines))
+
+if __name__=="__main__":
+    main()

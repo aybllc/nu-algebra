@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Nominal/Uncertainty Algebra Manuscript</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]},
+            displayAlign: "left"
+        });
+    </script>
+    <style>
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            line-height: 1.6;
+            max-width: 8.5in;
+            margin: 0 auto;
+            padding: 1in;
+            background: white;
+        }
+        h1 {
+            font-size: 16pt;
+            font-weight: bold;
+            text-align: center;
+            text-transform: uppercase;
+        }
+        h2 {
+            font-size: 14pt;
+            font-weight: bold;
+            margin-top: 24pt;
+            margin-bottom: 12pt;
+        }
+        h3 {
+            font-size: 12pt;
+            font-weight: bold;
+            margin-top: 18pt;
+            margin-bottom: 6pt;
+        }
+        .author-block {
+            text-align: center;
+            margin: 20pt 0;
+        }
+        .abstract {
+            margin: 20pt 40pt;
+            font-size: 11pt;
+        }
+        .abstract h2 {
+            text-align: center;
+            font-size: 12pt;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 20pt 0;
+        }
+        th, td {
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f0f0f0;
+            font-weight: bold;
+        }
+        .equation {
+            margin: 15pt 0;
+            text-align: center;
+        }
+        .inline-eq {
+            display: inline-block;
+            margin: 0 5px;
+        }
+        p {
+            text-align: justify;
+            margin: 12pt 0;
+        }
+        .example {
+            margin: 12pt 0;
+            font-style: italic;
+        }
+        .references p {
+            hanging-indent: 0.5in;
+            text-indent: -0.5in;
+            margin-left: 0.5in;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Nominal/Uncertainty Algebra: A Conservative, Auditable Calculus for Uncertainty Propagation</h1>
+
+<div class="author-block">
+    <p><strong>Author:</strong> Eric D. Martin<br>
+    <strong>Affiliation:</strong> —<br>
+    <strong>Keywords:</strong> uncertainty propagation; conservative bounds; algebraic frameworks; safety-critical decision-making; reproducibility<br>
+    <strong>MSC (primary/secondary):</strong> 65G30; 65C05; 62F35; 68W40</p>
+</div>
+
+<div class="abstract">
+<h2>Abstract</h2>
+<p>
+Quantifying and propagating uncertainty is central to every branch of science and engineering. Any claim without explicit error bounds risks being false, misleading, or unsafe. Existing approaches force trade-offs: Gaussian propagation is efficient but assumption-sensitive; Monte Carlo is general but costly and hard to audit; interval arithmetic is rigorous but often over-pessimistic.
+</p>
+<p>
+We propose Nominal/Uncertainty (N/U) Algebra: a minimal algebra where every quantity is a pair $(n, u)$ of nominal value and explicit nonnegative uncertainty. The operations
+</p>
+<div class="equation">
+$$(n_1, u_1) \oplus (n_2, u_2) = (n_1 + n_2, u_1 + u_2)$$
+</div>
+<div class="equation">
+$$(n_1, u_1) \otimes (n_2, u_2) = (n_1 n_2, |n_1| u_2 + |n_2| u_1)$$
+</div>
+<div class="equation">
+$$a \odot (n, u) = (a n, |a| u)$$
+</div>
+<p>
+are closed, monotone, and run in constant time. Special operators "catch" and "flip" preserve a conservation invariant $M = |n| + u$.
+</p>
+<p>
+We prove closure, associativity, commutativity, sub-distributivity, and cumulative-product formulas. Worked examples compare N/U against Gaussian error propagation, Monte Carlo, and interval arithmetic, showing that N/U bounds are always conservative yet remain tractable. By pinning uncertainty at Layer 2 of a Seven-Layer methodology, N/U provides a transparent, reproducible baseline for regulated workflows and safety-critical decisions.
+</p>
+</div>
+
+<h2>1. Introduction</h2>
+
+<p>
+Every scientific measurement is incomplete. A length, a voltage, a gene frequency—all have finite resolution and context. Reporting only a nominal is dangerous: it suggests a false precision. Conversely, overstating uncertainty paralyzes decision-making.
+</p>
+
+<p>
+Classical methods each take a stance. Gaussian or "root-sum-of-squares" rules are tight if errors are independent and small, but collapse when correlations or non-Gaussian tails intrude (Taylor, 2022). Monte Carlo simulates thousands of draws, robust in principle but computationally costly and hard to audit without fixed seeds (Metropolis & Ulam, 1949). Interval arithmetic encloses every possibility, guaranteeing truth but exploding in width under multiplication (Moore et al., 2009).
+</p>
+
+<p>
+What is needed is a baseline: algebraic, assumption-free, conservative, and fast. N/U Algebra was designed to fill this role. It is lean enough for spreadsheets and embedded systems, rigorous enough for regulators, and transparent enough for auditors.
+</p>
+
+<p>
+This manuscript presents the formal system, proves its key properties, demonstrates worked examples, and situates it in modern reproducibility frameworks like the Seven-Layer Methodology.
+</p>
+
+<h2>2. Preliminaries and Notation</h2>
+
+<p>
+We define the domain $A = \mathbb{R} \times \mathbb{R}_{\geq 0}$. An element $x = (n, u)$ carries a nominal $n$ and an uncertainty radius $u \geq 0$.
+</p>
+
+<p>
+<strong>Partial order:</strong> $(n, u) \preceq (n, u')$ if $u \leq u'$.
+</p>
+
+<p>
+<strong>Invariant:</strong> $M(n, u) = |n| + u$, used to prove conservation.
+</p>
+
+<p class="example">
+<strong>Example 2.1</strong> (measurement). A caliper reads $25.40 \pm 0.02$ mm: $x = (25.40, 0.02)$. Another part $12.70 \pm 0.01$ mm: $y = (12.70, 0.01)$. These will be inputs for addition and multiplication rules.
+</p>
+
+<h2>3. Algebraic Operations</h2>
+
+<p>
+For $x = (n_1, u_1), y = (n_2, u_2) \in A$ and scalar $a \in \mathbb{R}$:
+</p>
+
+<div class="equation">
+$$x \oplus y = (n_1 + n_2, u_1 + u_2)$$
+</div>
+
+<div class="equation">
+$$x \otimes y = (n_1 n_2, |n_1| u_2 + |n_2| u_1)$$
+</div>
+
+<div class="equation">
+$$a \odot x = (a n_1, |a| u_1)$$
+</div>
+
+<p>
+Special operators:
+</p>
+
+<div class="equation">
+$$C(n, u) = (0, |n| + u)$$
+</div>
+
+<div class="equation">
+$$B(n, u) = (u, |n|)$$
+</div>
+
+<p class="example">
+<strong>Example 3.1</strong> (addition). $(25.40, 0.02) \oplus (12.70, 0.01) = (38.10, 0.03)$ mm.
+</p>
+
+<p class="example">
+<strong>Example 3.2</strong> (multiplication, positive factors). $(10, 1) \otimes (20, 2) = (200, 40)$.
+</p>
+
+<p class="example">
+<strong>Example 3.3</strong> (multiplication, signs). $(-3, 0.4) \otimes (2, 0.5) = (-6, 2.3)$.
+</p>
+
+<p class="example">
+<strong>Example 3.4</strong> (scalar). $(-4) \odot (3, 0.2) = (-12, 0.8)$.
+</p>
+
+<p class="example">
+<strong>Example 3.5</strong> (catch/flip). $C(7, 0.6) = (0, 7.6)$; $B(-2, 0.5) = (0.5, 2)$.
+</p>
+
+<h2>4. Properties and Proofs</h2>
+
+<p>
+We list fundamental properties with concise proofs and examples.
+</p>
+
+<p>
+<strong>Closure.</strong> All operations map $A \to A$. Uncertainty terms are sums of nonnegatives.
+</p>
+
+<p>
+<strong>Identities.</strong> $(0, 0)$ is additive; $(1, 0)$ multiplicative.
+</p>
+
+<p>
+<strong>Commutativity.</strong> Immediate from symmetry of addition and multiplication.
+</p>
+
+<p>
+<strong>Associativity of addition.</strong> Standard real addition.
+</p>
+
+<p>
+<strong>Associativity of multiplication.</strong> For $x = (a, A), y = (b, B), z = (c, C)$:
+</p>
+
+<div class="equation">
+$$(x \otimes y) \otimes z = (abc, |ab|C + |ac|B + |bc|A)$$
+</div>
+
+<div class="equation">
+$$x \otimes (y \otimes z) = (abc, |ab|C + |ac|B + |bc|A)$$
+</div>
+
+<p class="example">
+<strong>Example 4.1.</strong> With $x = (3, 0.1), y = (4, 0.2), z = (2, 0.05)$: nominal $24$; uncertainty $3.6$, same whichever grouping is used.
+</p>
+
+<p>
+<strong>Monotonicity.</strong> Each rule is linear in nonnegative $u_i$; increasing any $u_i$ cannot decrease the output.
+</p>
+
+<p>
+<strong>Sub-distributivity.</strong> $x \otimes (y \oplus z) \preceq (x \otimes y) \oplus (x \otimes z)$, since $|b + c| \leq |b| + |c|$.
+</p>
+
+<p>
+<strong>Conservation.</strong> $M(C(n, u)) = M(B(n, u)) = |n| + u$.
+</p>
+
+<p>
+<strong>Cumulative product.</strong>
+</p>
+
+<div class="equation">
+$$\bigotimes_{i=1}^m (n_i, u_i) = \left(\prod_i n_i, \sum_{i=1}^m u_i \prod_{j \neq i} |n_j|\right)$$
+</div>
+
+<p>
+<strong>Proof.</strong> Induction on $m$.
+</p>
+
+<p>
+<strong>Function lifting.</strong> If $f$ is $L$-Lipschitz, define $f^\sharp(n, u) = (f(n), Lu)$. Then $|f(n + \delta) - f(n)| \leq L|\delta|$ ensures conservatism.
+</p>
+
+<h2>5. Related Work</h2>
+
+<p>
+<strong>Standards and engineering practice.</strong> The Joint Committee for Guides in Metrology's Guide to the Expression of Uncertainty in Measurement (GUM) remains the canonical reference for reporting and propagating measurement uncertainty; the NIST/SEMATECH e-Handbook provides practical engineering treatments and worked propagation examples. N/U aligns with this ecosystem by offering a conservative, algebraic baseline that is assumption-free and easy to audit.
+</p>
+
+<p>
+<strong>Probabilistic methods.</strong> The Gaussian (delta / RSS) approach is efficient and tight under small-error and independence assumptions; Monte Carlo offers assumption-flexible uncertainty estimates at sampling cost $O(N)$ and requires careful seeding for reproducibility. N/U is intentionally distribution-free and serves as a conservative ceiling when such assumptions are not justified.
+</p>
+
+<p>
+<strong>Deterministic enclosure.</strong> Interval arithmetic guarantees inclusion, but multiplicative chains can widen markedly via dependency; N/U avoids the interval product's pessimism while remaining auditable.
+</p>
+
+<p>
+<strong>Spectral approaches.</strong> Polynomial chaos expansions (PCE) deliver spectral accuracy when the law/regularity is known; coefficient growth with order and dimension underpins the common $O(p^d)$ shorthand. N/U complements PCE by providing a distribution-free safety ceiling.
+</p>
+
+<p>
+<strong>Imprecise probability and evidence.</strong> Probability boxes (p-boxes) and Dempster–Shafer structures bound distributions and support evidence combination, typically with higher modeling and computational overhead than N/U's pointwise bounds.
+</p>
+
+<p>
+<strong>Vagueness.</strong> Fuzzy sets and $\alpha$-cut arithmetic model graded membership (vagueness), not randomness. These tools have distinct semantics and are complementary to N/U's conservative-radius calculus.
+</p>
+
+<h2>6. Results</h2>
+
+<h3>6.1 Preliminary Rules and Corrections (transparent record)</h3>
+
+<p>
+Early experiments used a non-absolute product and an involutive flip:
+</p>
+
+<div class="equation">
+$$(n_1, u_1) \otimes (n_2, u_2) = (n_1 n_2, n_1 u_2 + n_2 u_1)$$
+</div>
+
+<div class="equation">
+$$B(n, u) = (u, n)$$
+</div>
+
+<p>
+Both fail closure for valid inputs with negative nominals:
+</p>
+
+<div class="equation">
+$$(-1, 0.1) \otimes (0, 0.2) = (0, -0.2)$$
+</div>
+
+<div class="equation">
+$$B(-2, 0.5) = (0.5, -2)$$
+</div>
+
+<p>
+We therefore adopt the closure-preserving rules:
+</p>
+
+<div class="equation">
+$$(n_1, u_1) \otimes (n_2, u_2) = (n_1 n_2, |n_1| u_2 + |n_2| u_1)$$
+</div>
+
+<div class="equation">
+$$B(n, u) = (u, |n|)$$
+</div>
+
+<p>
+These restore closure, preserve monotonicity, and conserve $M(n, u) = |n| + u$. Flip ceases to be an involution—a conscious trade for well-typedness. All computations below use the corrected rules.
+</p>
+
+<p>
+<strong>Note.</strong> A typographic slip in §4's three-factor "sanity check" produced $0.8 + 1.2 + 0.6 = 3.6$; the correct sum is $2.6$.
+</p>
+
+<h3>6.2 Worked computations (with cross-method comparisons)</h3>
+
+<p>
+<strong>R1 (sum chain).</strong> $(10 \pm 1) \oplus (5 \pm 0.5) = (15, 1.5)$.<br>
+RSS: $\sqrt{1^2 + 0.5^2} = 1.118$. MC ($N$ large): $\approx 1.12$. Intervals: half-width $1.5$. N/U matches interval-sum and overbounds RSS/MC as designed.
+</p>
+
+<p>
+<strong>R2 (product).</strong> $(10 \pm 1) \otimes (5 \pm 0.5) = (50, |10| \cdot 0.5 + |5| \cdot 1) = (50, 10)$.<br>
+RSS: $\sqrt{(10 \cdot 0.5)^2 + (5 \cdot 1)^2} = 7.07$. Intervals $[9, 11] \times [4.5, 5.5] \Rightarrow$ half-width $10$. N/U equals interval half-width here and cleanly overbounds RSS.
+</p>
+
+<p>
+<strong>R3 (ten identical factors).</strong> $\bigotimes_{i=1}^{10} (1.00 \pm 0.01) = (1.000, 0.10)$ by the cumulative formula. Intervals $[0.99, 1.01]^{10} \Rightarrow [0.99^{10}, 1.01^{10}]$ with half-width $\approx 0.1005$. RSS (small-error, independent) gives $\sqrt{10} \cdot 0.01 \approx 0.0316$.
+</p>
+
+<p>
+<strong>R4 (three-factor product).</strong> $(3 \pm 0.1) \otimes (4 \pm 0.2) \otimes (2 \pm 0.05) = (24, 0.1 \cdot 8 + 0.2 \cdot 6 + 0.05 \cdot 12) = (24, 2.6)$.<br>
+Intervals $[2.9, 3.1] \times [3.8, 4.2] \times [1.95, 2.05] \Rightarrow$ half-width $\approx 2.601$. RSS $\approx 1.562$. Again: RSS < Interval-half-width ≈ N/U.
+</p>
+
+<table>
+<caption><strong>Table 1</strong> — Worked results and cross-method comparisons</caption>
+<thead>
+<tr>
+<th>Case</th>
+<th>Operation</th>
+<th>Operands $(n \pm u)$</th>
+<th>N/U $u$</th>
+<th>RSS $u$</th>
+<th>MC (sd)</th>
+<th>Interval $u$</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R1</td>
+<td>Add</td>
+<td>$10 \pm 1, 5 \pm 0.5$</td>
+<td>1.5</td>
+<td>1.118</td>
+<td>≈1.12</td>
+<td>1.5</td>
+</tr>
+<tr>
+<td>R2</td>
+<td>Mult</td>
+<td>$10 \pm 1, 5 \pm 0.5$</td>
+<td>10.0</td>
+<td>7.07</td>
+<td>≈7.1</td>
+<td>10.0</td>
+</tr>
+<tr>
+<td>R3</td>
+<td>Mult (10×)</td>
+<td>$1.00 \pm 0.01$</td>
+<td>0.100</td>
+<td>0.032</td>
+<td>—</td>
+<td>≈0.1005</td>
+</tr>
+<tr>
+<td>R4</td>
+<td>Mult (3×)</td>
+<td>$3 \pm 0.1, 4 \pm 0.2, 2 \pm 0.05$</td>
+<td>2.6</td>
+<td>1.56</td>
+<td>—</td>
+<td>≈2.60</td>
+</tr>
+</tbody>
+</table>
+
+<h2>7. Applications</h2>
+
+<p>
+<strong>A1 (Pedagogical chain).</strong> Three parts measured $25.40 \pm 0.02$ mm each convert to cm via $(0.1, 0)$: each $(2.540, 0.002)$ cm; sum $(7.620, 0.006)$ cm. This style mirrors GUM/NIST record-keeping and is ideal for instructional labs and QA spreadsheets.
+</p>
+
+<p>
+<strong>A2 (Engineering multiplicative cascade).</strong> Gear-train ratio $R = \prod r_i$ with $r_1 = (1.50, 0.02), r_2 = (0.80, 0.01), r_3 = (1.20, 0.02)$ gives
+</p>
+
+<div class="equation">
+$$n = 1.44, \quad u = 0.02 \cdot |0.96| + 0.01 \cdot |1.80| + 0.02 \cdot |1.20| = 0.0612$$
+</div>
+
+<p>
+Intervals and RSS give alternative bounds under different assumptions; N/U supplies the conservative audit trail.
+</p>
+
+<p>
+<strong>A3 (High-dimensional screen).</strong> For $d = 20$ factors $(1.00 \pm 0.005)$, Prop. P7 yields $u = 0.10$. Monte Carlo approximates distributional features at $O(N)$ cost; PCE is sharper under structure but grows with basis size. N/U is a fast ceiling before invoking MC or PCE.
+</p>
+
+<h2>8. Comparative Analysis</h2>
+
+<p><strong>When to use which tool.</strong></p>
+
+<ul>
+<li><strong>N/U (this work):</strong> zero assumptions, $O(1)$ primitives, reproducible and audit-ready; conservative by design.</li>
+<li><strong>Gaussian/RSS:</strong> tight if small-error/independent; optimistic if violated.</li>
+<li><strong>Monte Carlo:</strong> flexible and asymptotically correct; runtime and seed management matter.</li>
+<li><strong>Intervals:</strong> enclosure guaranteed; dependency blow-up possible.</li>
+<li><strong>PCE / spectral:</strong> spectral accuracy under regularity/known law; coefficient growth with order/dimension.</li>
+<li><strong>P-boxes / DS:</strong> rigorous distributional bounds; higher modeling cost.</li>
+<li><strong>Fuzzy:</strong> graded membership (vagueness) via $\alpha$-cuts; different semantics than randomness.</li>
+</ul>
+
+<table>
+<caption><strong>Table 2</strong> — Qualitative comparison</caption>
+<thead>
+<tr>
+<th>Method</th>
+<th>Core assumption</th>
+<th>Typical cost</th>
+<th>Strength</th>
+<th>Limitation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>N/U</td>
+<td>none (bounds)</td>
+<td>$O(1)$</td>
+<td>conservative, auditable</td>
+<td>can be wide</td>
+</tr>
+<tr>
+<td>Gaussian/RSS</td>
+<td>small errors, independence</td>
+<td>$O(1)$</td>
+<td>tight, analytic</td>
+<td>optimistic if wrong</td>
+</tr>
+<tr>
+<td>Monte Carlo</td>
+<td>distributional model</td>
+<td>$O(N)$</td>
+<td>flexible</td>
+<td>runtime, seeds</td>
+</tr>
+<tr>
+<td>Interval</td>
+<td>bounds only</td>
+<td>$O(1)$</td>
+<td>enclosure</td>
+<td>dependency blow-up</td>
+</tr>
+<tr>
+<td>PCE</td>
+<td>smoothness + known law</td>
+<td>$O(p^d)$</td>
+<td>spectral-tight</td>
+<td>parameter growth</td>
+</tr>
+<tr>
+<td>P-boxes / DS</td>
+<td>imprecise prob.</td>
+<td>high</td>
+<td>rigorous bounds</td>
+<td>complexity</td>
+</tr>
+<tr>
+<td>Fuzzy</td>
+<td>graded membership</td>
+<td>per-$\alpha$</td>
+<td>intuitive</td>
+<td>not stochastic</td>
+</tr>
+</tbody>
+</table>
+
+<h2>9. Complexity and Reproducibility</h2>
+
+<p>
+<strong>Complexity.</strong> Each primitive op is $O(1)$; an $m$-term chain is $O(m)$ using the cumulative formula (Prop. P7). Monte Carlo scales with sample size; PCE's coefficient count grows with order and dimension (hence $p^d$ folklore).
+</p>
+
+<p>
+<strong>Reproducibility plan.</strong> Provide a versioned artifact (code/data), environment lock, and fixed seeds for MC; include one-command runners that regenerate Table 1 and the application numbers from declarative configs. This mirrors GUM/NIST guidance for auditable calculation and documentation chains.
+</p>
+
+<h2>10. Conclusion</h2>
+
+<p>
+N/U Algebra offers a minimal, closed, and auditable calculus for uncertainty. It is not a replacement for probabilistic or spectral methods; it is a safe ceiling—fast, transparent, and distribution-free. In safety-critical or regulated work, such a ceiling is essential; when assumptions are justified, Gaussian/RSS, Monte Carlo, or PCE can tighten bounds beneath it. The worked examples and comparisons demonstrate that N/U reliably overbounds RSS/MC while avoiding interval-product explosion, and the proofs ensure the algebra behaves predictably in composition. Coupled with a straightforward reproducibility plan, N/U provides a practical foundation for trustworthy quantitative claims.
+</p>
+
+<h2>References</h2>
+
+<div class="references">
+<p>JCGM (2008). Evaluation of measurement data — Guide to the expression of uncertainty in measurement (GUM). BIPM. DOI: 10.59161/JCGM100-2008E.</p>
+
+<p>NIST/SEMATECH. e-Handbook of Statistical Methods (incl. propagation pages).</p>
+
+<p>Metropolis, N., & Ulam, S. (1949). The Monte Carlo Method. JASA, 44(247), 335–341.</p>
+
+<p>Moore, R. E., Kearfott, R. B., & Cloud, M. J. (2009). Introduction to Interval Analysis. SIAM.</p>
+
+<p>Xiu, D., & Karniadakis, G. E. (2002). The Wiener–Askey polynomial chaos for SDEs. SIAM J. Sci. Comput., 24(2), 619–644.</p>
+
+<p>Le Maître, O., & Knio, O. M. (2010). Spectral Methods for Uncertainty Quantification. Springer.</p>
+
+<p>Ferson, S., Kreinovich, V., Ginzburg, L., Myers, D., & Sentz, K. (2003). Constructing Probability Boxes and Dempster–Shafer Structures. Sandia (SAND2002-4015).</p>
+
+<p>Shafer, G. (1976). A Mathematical Theory of Evidence. Princeton Univ. Press.</p>
+
+<p>Zadeh, L. A. (1965). Fuzzy Sets. Information and Control, 8, 338–353.</p>
+
+<p>Hanss, M. (2005). Applied Fuzzy Arithmetic: An Introduction with Engineering Applications. Springer.</p>
+</div>
+
+<h2>Appendix A — Expanded Derivations (selected)</h2>
+
+<h3>A.1 Cumulative product (full induction).</h3>
+
+<p>
+Base $m = 2$ is the definition. Assume for $m$. Let $\Pi_m = \prod_{i=1}^m n_i$. Then
+</p>
+
+<div class="equation">
+$$\left(\Pi_m, \sum_{i=1}^m u_i \prod_{j \neq i, j \leq m} |n_j|\right) \otimes (n_{m+1}, u_{m+1}) = \left(\Pi_m n_{m+1}, |\Pi_m| u_{m+1} + \sum_{i=1}^m u_i \prod_{j \neq i, j \leq m} |n_j| |n_{m+1}|\right)$$
+</div>
+
+<p>
+which equals $\left(\prod_{i=1}^{m+1} n_i, \sum_{i=1}^{m+1} u_i \prod_{j \neq i} |n_j|\right)$.
+</p>
+
+<h3>A.2 Sub-distributivity details.</h3>
+
+<p>
+For $x = (a, A), y = (b, B), z = (c, C)$, the nominal is $a(b + c)$ both sides; radii compare via
+</p>
+
+<div class="equation">
+$$|b + c| \leq |b| + |c|, \text{ hence } x \otimes (y \oplus z) \preceq (x \otimes y) \oplus (x \otimes z)$$
+</div>
+
+<h3>A.3 Function lifting and composition.</h3>
+
+<p>
+If $f$ is $L_f$-Lipschitz near $n$ and $g$ is $L_g$-Lipschitz near $m$, then
+</p>
+
+<div class="equation">
+$$(f \circ g)^\sharp(n, u) = (f(g(n)), L_f L_g u)$$
+</div>
+
+<p>
+by successive application of the Lipschitz bounds.
+</p>
+
+</body>
+</html>

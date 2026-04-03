@@ -1,0 +1,43 @@
+September 28, 2025
+
+Editor-in-Chief
+[Journal Name]
+[Journal Address Line 1]
+[City, State/Province, Postal Code]
+[Country]
+
+Re: Submission of manuscript “Nominal–Uncertainty (N/U) Algebra: A conservative, associative calculus for fast uncertainty propagation”
+
+Dear Editor,
+
+I am pleased to submit the enclosed manuscript for consideration as a [Article Type, e.g., Research Article] in [Journal Name]. The paper introduces the Nominal–Uncertainty (N/U) Algebra, a closed-form framework for propagating uncertainty using ordered pairs (n, u) ∈ ℝ × ℝ₊, together with a small set of compositional operators. Version 4 of the manuscript corrects algebraic details and consolidates the theoretical and numerical results into a journal-ready presentation.
+
+Main contributions
+• A rigorously defined multiplication rule (n₁, u₁) ⊗ (n₂, u₂) = (n₁n₂, |n₁|u₂ + |n₂|u₁) that preserves nonnegativity (closure on ℝ × ℝ₊).
+• A complete proof that ⊗ is associative; triple products match under all groupings, resolving prior contradictions.
+• A repaired “Flip” operator B(n, u) = (u, |n|) that preserves the codomain and a conserved measure M = |n| + u.
+• Formal statements and proofs of closure, monotonicity, identity elements, and sub‑distributivity.
+• Numerical validation across tens of thousands of trials, demonstrating conservative bounds relative to first‑order Gaussian propagation and tight agreement with interval arithmetic for nonnegative nominals.
+• Reproducible artifacts (data and code) accompanying the manuscript; experiments were run with SEED = 20250926 and stated absolute/relative tolerances.
+
+Why it fits [Journal Name]
+The work offers a mathematically transparent alternative to simulation‑heavy pipelines for routine propagation (addition and multiplication chains) with clear complexity advantages. It should be of interest to readers working in uncertainty quantification, interval methods, verification/validation, and computational science who need fast, conservative propagation with guarantees.
+
+Compliance and disclosures
+• The work is original, not under review elsewhere, and all authors approve the submission.
+• No human or animal subjects, and no competing interests are declared.
+• Data and code availability: a permanent repository will be provided at DOI: [insert DOI], mirroring the exact version used to produce the figures and tables in this submission.
+• Suggested handling editor and reviewers (optional): [Names/Affiliations/Emails or “none”]. We have no conflicts with the suggested reviewers.
+
+For editorial routing (optional metadata)
+Keywords: uncertainty propagation; nominal–uncertainty algebra; associative operations; interval analysis; Monte Carlo validation; invariant measures.
+MSC 2020: Primary 65G10; Secondary 65C05, 62F35.
+
+Thank you for considering our work. We believe the combination of clear algebra, formal guarantees, and reproducible evidence will make it a useful contribution for your readership. We would be happy to address any questions during review.
+
+Sincerely,
+
+[Corresponding Author Name], [Affiliation]
+[Postal Address]
+[Email] | [Phone]
+ORCID: [0000-0000-0000-0000]

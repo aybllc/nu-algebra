@@ -1,0 +1,119 @@
+\documentclass[11pt]{amsart}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{microtype}
+\usepackage{mathtools}
+
+\title[Nominal--Uncertainty Algebra (cleaned)]{Nominal--Uncertainty Algebra: Definitions, Properties, and Numerical Results (Cleaned Version)}
+
+\author{Author Name}
+\address{Department, Institution, City, Country}
+\email{author@example.edu}
+
+\keywords{uncertainty propagation, nominal algebra, interval arithmetic, p-boxes, Monte Carlo}
+\subjclass[2020]{Primary 60A10; Secondary 65C05, 15A99}
+
+\begin{document}
+\begin{abstract}
+% NOTE: Paste the final abstract here as a single paragraph (max 250 words, no citations or equations).
+This cleaned LaTeX skeleton contains the corrected algebraic definitions (ensuring nonnegative uncertainty propagation), theorem/proof environments, moved personal narrative to the Acknowledgments, and corrected worked numerical examples. Replace this paragraph with your final, single-paragraph abstract (no citations, no displayed equations), \\textbf{max 250 words}.
+\end{abstract}
+
+\maketitle
+
+\section{Introduction}
+This manuscript proposes and analyzes an algebra for pairs $(n,u)\in\mathbb{R}\times\mathbb{R}_{\ge 0}$ where $n$ denotes a nominal value and $u$ its associated nonnegative uncertainty (half-width). The cleaned version organizes definitions, theorems, and proofs in conventional style and moves personal narrative to the Acknowledgments. Numerical tables and seeds are referenced in the Supplementary Materials.
+
+\section{Preliminaries and notation}
+We work throughout with the set
+\begin{equation*}
+\mathcal{N} \coloneqq \mathbb{R}\times\mathbb{R}_{\ge 0} = \{(n,u): n\in\mathbb{R},\ u\in\mathbb{R}_{\ge 0}\}.
+\end{equation*}
+
+\subsection{Basic operators}
+\begin{definition}[Addition]
+For $(n_1,u_1),(n_2,u_2)\in\mathcal{N}$ define
+\begin{equation*}
+(n_1,u_1)\oplus(n_2,u_2)\coloneqq (n_1+n_2,\ u_1+u_2).
+\end{equation*}
+\end{definition}
+
+\begin{definition}[Multiplication --- corrected]\label{def:multiply}
+For $(n_1,u_1),(n_2,u_2)\in\mathcal{N}$ define the product
+\begin{equation}\label{eq:multiplication}
+(n_1,u_1)\otimes(n_2,u_2)\coloneqq\big(n_1 n_2,\ |n_1|\,u_2 + |n_2|\,u_1\big).
+\end{equation}
+\end{definition}
+
+\noindent This definition uses absolute values on the nominal coefficients in the uncertainty term, which guarantees the second component remains nonnegative and preserves closure $\mathcal{N}\to\mathcal{N}$.
+
+\begin{definition}[Flip operator --- revised]\label{def:flip}
+Define a \emph{Flip} operator $B:\mathcal{N}\to\mathcal{N}$ by either of the following (choose one and state in main text):
+
+\begin{enumerate}
+\item (Typed domain option) Restrict the domain to $\{(n,u)\in\mathcal{N}:n\ge 0\}$ and set $B(n,u)=(u,n)$. In this case $B$ is an involution on the restricted typed domain and preserves the invariant $M(n,u)=|n|+u$.
+\item (Closure-preserving option, non-involution) Define
+\begin{equation}\label{eq:flip_abs}
+B(n,u)\coloneqq (u,|n|).
+\end{equation}
+This preserves the codomain $\mathcal{N}$ and the conserved quantity $M(n,u)=|n|+u$, but $B$ is no longer an involution in general. State this choice explicitly in the manuscript.
+\end{enumerate}
+\end{definition}
+
+\section{Algebraic properties}
+
+\begin{theorem}[Closure]\label{thm:closure}
+The operations $\oplus$ and $\otimes$ map $\mathcal{N}\times\mathcal{N}\to\mathcal{N}$, i.e., the result of addition or multiplication of two nominal--uncertainty pairs is another nominal--uncertainty pair.
+\end{theorem}
+\begin{proof}
+Closure for $\oplus$ is immediate: the second component sums nonnegative reals. For $\otimes$, by \eqref{eq:multiplication} the uncertainty component is $|n_1|u_2+|n_2|u_1\ge 0$ since $|n_i|\ge 0$ and $u_i\ge0$. The nominal product $n_1n_2\in\mathbb{R}$. Hence closure holds.
+\end{proof}
+
+\begin{theorem}[Associativity of $\otimes$]\label{thm:associative}
+The multiplication $\otimes$ defined in Definition \ref{def:multiply} is associative on $\mathcal{N}$:
+\begin{equation*}
+\big((n_1,u_1)\otimes(n_2,u_2)\big)\otimes(n_3,u_3)
+= (n_1,u_1)\otimes\big((n_2,u_2)\otimes(n_3,u_3)\big).
+\end{equation*}
+\end{theorem}
+\begin{proof}[Sketch of proof]
+Compute both sides using \eqref{eq:multiplication} and check equality of nominal and uncertainty components. The nominal components match by ordinary associativity of real multiplication. For the uncertainty component, absolute values yield identical expansions on both parenthesizations; explicitly the three-term uncertainty equals
+\begin{equation*}
+|n_1||n_2|u_3 + |n_1||n_3|u_2 + |n_2||n_3|u_1,
+\end{equation*}
+which is symmetric under the grouping. This verifies associativity. (Expand as Lemma if needed.)
+\end{proof}
+
+\section{Worked numerical examples (corrected)}
+\begin{table}[h]
+\centering
+\caption{Corrected worked examples for multiplication. Intervals noted as $[n-u,n+u]$.}
+\begin{tabular}{lcc}
+\toprule
+Inputs & Operation & Result (nominal, uncertainty) \\
+\midrule
+$(100,10)\otimes(200,5)$ & $\otimes$ & $(100\cdot200,\ |100|\cdot5 + |200|\cdot10) = (20000,\ 2500)$ \\
+$[9,11]\times[4.5,5.5]$ & interval product & center $\;9.5\cdot5.0=47.5$; half-width $=10$ (exact)\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Numerical results and reproducibility}
+Numerical experiments, Monte Carlo comparators, seeds and configuration files are provided in the Supplementary ZIP. See the README for seeds and exact command lines. (Supplement references: data bundle and csvs.)
+
+\section{Discussion and conclusion}
+This cleaned manuscript version separates mathematical core from narrative, enforces algebraic corrections that guarantee nonnegative uncertainty propagation, and supplies corrected worked examples. The main text should reference extended comparisons to interval methods, p-boxes, Dempster--Shafer, and PCE approaches; include a larger literature review (40--60 items) in the final submission as noted in the project brief.
+
+\section*{Acknowledgments}
+Personal narrative and author notes moved here. If you prefer a shorter Acknowledgments paragraph, replace this section with the succinct version for the target journal. 
+
+\appendix
+\section{Auxiliary proofs and long derivations}
+Move extended lemmas, long algebraic expansions, and numeric table data here. Keep the main text concise.
+
+\bibliographystyle{plain}
+\bibliography{nu_cleaned_references}
+
+\end{document}

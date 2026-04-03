@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python:*)",
+      "Read(//run/media/root/OP01/PUBLISHED/nu_algebra/autism/final/**)",
+      "Read(//run/media/root/OP01/PUBLISHED/nu_algebra/autism/**)",
+      "Bash(/bin/cp -f /run/media/root/OP01/PUBLISHED/nu_algebra/autism/final_v3/nu_gap_final_package_weighted_v3/scripts/run_nu_gap.py /run/media/root/OP01/PUBLISHED/nu_algebra/autism/final/nu_gap_rigorous_package/scripts/run_nu_gap.py)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

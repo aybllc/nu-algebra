@@ -1,0 +1,42 @@
+{
+  "metadata": {
+    "title": "Nominal/Uncertainty Algebra as a Peer Review Instrument in Psychological Science: A Conservative Framework for Claim Robustness",
+    "upload_type": "publication",
+    "publication_type": "preprint",
+    "description": "<p><strong>Preprint:</strong> Nominal/Uncertainty Algebra as a Peer Review Instrument in Psychological Science: A Conservative Framework for Claim Robustness</p>\n<p><strong>Abstract.</strong> Psychological science faces persistent challenges in replicability and effect-size stability. \nWe present Nominal/Uncertainty (N/U) algebra\u2014a conservative, distribution-agnostic representation in which every result is a pair (n, u) of nominal value and explicit uncertainty bound\u2014and evaluate it as a peer-review instrument for stress-testing claims.\nThe revised algebra restores closure, associativity, and monotonicity via absolute-value terms in products and preserves the invariant M(n,u)=|n|+u. \nUsing only published point estimates and 95% confidence intervals, we recode several contested effects (ego depletion, power posing behaviors/hormones, facial feedback) and classify claims as fragile whenever |n| \u2264 u. \nResults align with preregistered multi-lab replications: the conservative intervals include zero for ego depletion, facial feedback, mortality salience, while a positive-control anchoring meta-estimate remains robust.\nA 70k-case validation corpus shows N/U \u2265 Gaussian first-order/RSS and matches interval arithmetic for nonnegative nominals to within floating-point error, with stable chaining across long products.\nWe argue for a one-line N/U check in review guidelines as a low-cost, auditable safety net complementing Registered Reports, equivalence tests, and Bayesian estimation.\n</p>\n<p><strong>Artifacts.</strong> Supplementary datasets and numerical validation (70k+ test cases) are publicly archived and versioned at Zenodo (dataset DOI below). This preprint also ships with a compact audit CSV and figures for psychology case studies.</p>\n<ul>\n  <li><em>N/U audit table (6 case studies)</em>: nu_psych_audit_expanded.csv</li>\n  <li><em>N/U S/U figure</em>: nu_psych_audit_expanded_su_ratio.png</li>\n</ul>\n<p><strong>Dataset DOI.</strong> 10.5281/zenodo.17221863 (N/U Numerical Validation Dataset).</p>\n<p><strong>License.</strong> CC-BY-4.0</p>\n",
+    "creators": [
+      {
+        "name": "Martin, Eric D.",
+        "affiliation": "Independent researcher",
+        "orcid": "0009-0006-5944-1742"
+      },
+      {
+        "name": "<<<ADD YOUR NAME HERE>>>",
+        "affiliation": "<<<ADD AFFILIATION>>>"
+      }
+    ],
+    "keywords": [
+      "uncertainty propagation",
+      "interval methods",
+      "replication crisis",
+      "psychology",
+      "metascience",
+      "conservative bounds",
+      "peer review",
+      "registered reports"
+    ],
+    "language": "eng",
+    "version": "v1.0.0",
+    "license": "cc-by-4.0",
+    "access_right": "open",
+    "related_identifiers": [
+      {
+        "identifier": "10.5281/zenodo.17221863",
+        "relation": "isSupplementedBy",
+        "resource_type": "dataset"
+      }
+    ],
+    "notes": "Deposit type: preprint. Please update creators and affiliations before publishing.",
+    "prereserve_doi": true
+  }
+}

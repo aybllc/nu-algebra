@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+message: "If you use this preprint, please cite it as below."
+title: "Nominal/Uncertainty Algebra as a Peer Review Instrument in Psychological Science: A Conservative Framework for Claim Robustness"
+type: article
+authors:
+  - family-names: Martin
+    given-names: Eric D.
+    orcid: https://orcid.org/0009-0006-5944-1742
+  - family-names: <<<ADD SURNAME>>>
+    given-names: <<<ADD GIVEN NAMES>>>
+    affiliation: <<<ADD AFFILIATION>>>
+repository-code: <<<ADD REPO URL IF ANY>>>
+license: CC-BY-4.0
+date-released: 2025-10-02
+doi: <<<ZENODO DOI WILL APPEAR HERE AFTER PUBLISHING>>>
+preferred-citation:
+  type: article
+  authors:
+    - family-names: Martin
+      given-names: Eric D.
+      orcid: https://orcid.org/0009-0006-5944-1742
+    - family-names: <<<ADD SURNAME>>>
+      given-names: <<<ADD GIVEN NAMES>>>
+  title: "Nominal/Uncertainty Algebra as a Peer Review Instrument in Psychological Science: A Conservative Framework for Claim Robustness"
+  journal: "Zenodo Preprints"
+  year: 2025
+  doi: <<<ZENODO DOI>>>
