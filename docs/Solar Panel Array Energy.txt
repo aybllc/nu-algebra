@@ -1,0 +1,147 @@
+Solar Panel Array Energy Output
+
+Each solar panel contributes power with uncertainty due to weather and sensor noise.
+
+Panel A = 100⟨5⟩ watts
+
+Panel B = 95⟨4⟩ watts
+
+Panel C = 105⟨6⟩ watts
+
+Step 1. Addition (⊕)
+Total output = A ⊕ B ⊕ C
+= (100+95+105, 5+4+6)
+= 300⟨15⟩ W
+
+Step 2. Multiplication (⊗)
+Multiply by hours of sunlight. Suppose 4⟨0.3⟩ hours.
+(300×4, 300×0.3 + 4×15)
+= (1200, 90 + 60)
+= 1200⟨150⟩ Wh
+
+Step 3. Catch (Cα)
+Halfway through the day, Panel B’s sensor malfunctions. Instead of 95⟨4⟩, all we can log is “uncertain pocket” using Catch:
+
+Cα(95⟨4⟩) = (0, |95|+4) = 0⟨99⟩
+
+Now the running dataset preserves the fact that Panel B contributed something, but we no longer pretend we know how much.
+
+Step 4. Flip (Bλ)
+Later, Panel C is physically disconnected for maintenance. Output must be zero, but its uncertainty band (what it could have produced) still counts in planning margins.
+
+Bλ(105⟨6⟩) = (0, 105+6) = 0⟨111⟩
+
+Final Dataset State
+
+Step 1 (sum): 300⟨15⟩ W
+
+Step 2 (scaled by time): 1200⟨150⟩ Wh
+
+Step 3 (Catch on B): 0⟨99⟩
+
+Step 4 (Flip on C): 0⟨111⟩
+
+Why conservative rules?
+
+In N/U algebra, uncertainties never shrink by accident. They only grow (or stay) when combined. That’s called conservatism.
+
+Why it matters:
+
+In engineering or science, the biggest danger isn’t overestimating uncertainty—it’s underestimating it. If you claim something is more precise than it is, your bridge collapses, your rocket explodes, your medical dose kills.
+
+Conservative means you stay inside the pocket—your prediction band is wide enough to contain the truth.
+
+Think of it like wearing a slightly oversized helmet: you may look silly, but your brain is safe. Too small, and you’re concussed.
+
+What does “within the pocket” mean?
+
+When you add or multiply values with uncertainties, the N/U rules guarantee the result still encloses the real answer.
+
+Naïve propagation (like just adding percentages in quadrature) can underestimate if you make hidden assumptions (independence, Gaussian distribution, etc.).
+
+The N/U way is assumption-light: it never promises more than the data gave you. That’s the “pocket”—the zone you know the truth is inside.
+
+How it helps in first-round naive deterministic uncertainty propagation
+
+Students usually start with deterministic values—“this rod is 2.0 m long, that force is 10 N”—and only later bolt on error bars. N/U algebra forces them to carry uncertainties from the very start, without fancy statistics.
+
+Example:
+
+You measure a board length: 2.0⟨0.1⟩ m
+
+You cut 3 boards and nail them: total = (2+2+2, 0.1+0.1+0.1) = 6.0⟨0.3⟩ m
+
+You don’t need probability theory or distributions. You just know your final assembly is somewhere in a 30 cm wide pocket around 6 m. That’s enough to decide if the lumber fits in the truck or not.
+
+Why students should care
+
+It’s the first draft of safety margins. Before Monte Carlo sims, before Bayesian updates, there’s this simple pocket math.
+
+It makes uncertainty visible and honest, instead of hidden in footnotes.
+
+It matches how real-world design reviews work: “what’s our worst-case bound?” not “what’s our average case?”
+
+
+Exercise Sheet: N/U Algebra in Action
+
+Scenario: A solar farm with three panels. Each panel’s output is measured with uncertainty. We’ll track the farm’s energy across a single day using the N/U rules: Addition (⊕), Multiplication (⊗), Catch (Cα), and Flip (Bλ).
+
+Dataset (Raw Measurements)
+Panel	Measurement (watts)	Expressed as n⟨u⟩
+A	100 ± 5 W	100⟨5⟩
+B	95 ± 4 W	95⟨4⟩
+C	105 ± 6 W	105⟨6⟩
+Step 1. Addition (⊕) – Combine outputs
+
+Formula: (n1+n2, u1+u2)
+
+A ⊕ B ⊕ C = (100+95+105, 5+4+6)
+= (300, 15)
+= 300⟨15⟩ W
+
+Interpretation: The farm produces about 300 W, with an uncertainty pocket of ±15 W.
+
+Step 2. Multiplication (⊗) – Scale by time
+
+Sun shines for 4⟨0.3⟩ hours.
+
+Formula: (n1n2, n1u2 + n2u1)
+
+(300⟨15⟩) ⊗ (4⟨0.3⟩)
+= (300×4, 300×0.3 + 4×15)
+= (1200, 90 + 60)
+= 1200⟨150⟩ Wh
+
+Interpretation: Over 4 hours, the farm generates 1200 Wh, with ±150 Wh of uncertainty.
+
+Step 3. Catch (Cα) – Sensor failure
+
+At noon, Panel B’s sensor fails. We can’t trust its value anymore, so we collapse its nominal into uncertainty:
+
+Cα(95⟨4⟩) = (0, |95|+4) = 0⟨99⟩
+
+Interpretation: We no longer know the actual output, but we know the possible pocket it could lie in.
+
+Step 4. Flip (Bλ) – Panel disconnected
+
+Later, Panel C is shut off for maintenance. Value is zero, but we keep the uncertainty pocket of what it could have produced:
+
+Bλ(105⟨6⟩) = (0, 105+6) = 0⟨111⟩
+
+Interpretation: We erase the measured value but carry forward the “shadow” of its uncertainty.
+
+Summary Table
+Step	Result (n⟨u⟩)	Meaning
+Initial sum	300⟨15⟩ W	All panels combined
+After multiply	1200⟨150⟩ Wh	Scaled for 4 hours
+Catch on B	0⟨99⟩	Sensor failed
+Flip on C	0⟨111⟩	Panel disconnected
+Teaching Notes
+
+Addition shows how uncertainties add directly.
+
+Multiplication shows scaling and how both parts of the product feed uncertainty.
+
+Catch emphasizes data collapse: the value is gone, but uncertainty expands to cover it.
+
+Flip emphasizes a hard reset: zero output, but uncertainty carried as trace.

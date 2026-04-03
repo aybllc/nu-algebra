@@ -1,0 +1,136 @@
+umerical Results Consistency – Worksheet
+Worked Example 1: Addition (Voltages)
+    • Inputs: (2.00 V, 0.05 V), (1.20 V, 0.02 V)
+    • N/U rule: (n₁+n₂, u₁+u₂)
+    • Expected result: (3.20 V, 0.07 V)
+☐ Check: does manuscript table/text match 0.07?
+
+Worked Example 2: Multiplication (Lengths)
+    • Inputs: (4.0 m, 0.1 m), (3.0 m, 0.2 m)
+    • N/U rule: (n₁n₂, |n₁|u₂ + |n₂|u₁)
+    • Expected result: (12.0 m², 1.1 m²)
+☐ Check: does manuscript table/text match 1.1?
+
+Worked Example 3: Large Multiplication (100±10 ⊗ 200±5)
+    • Inputs: (100, 10), (200, 5)
+    • Uncertainty: |100|·5 + |200|·10 = 500 + 2000 = 2500
+    • Expected result: (20,000, 2500)
+☐ Check: manuscript shows 2500, not 3000?
+
+Worked Example 4: Interval Comparison [9,11] × [4.5,5.5]
+    • Intervals: [9,11], [4.5,5.5]
+    • Product range: [9×4.5, 11×5.5] = [40.5, 60.5]
+    • Half-width: (60.5 − 40.5)/2 = 10
+☐ Check: manuscript shows 10, not 10.5?
+
+Worked Example 5: Summation (Three Distances)
+    • Inputs: (100.0, 2.0), (105.0, 1.5), (102.5, 1.0)
+    • Uncertainty: 2.0 + 1.5 + 1.0 = 4.5
+    • Expected result: (307.5, 4.5)
+☐ Check: manuscript shows 4.5, not Gaussian ~2.69?
+
+Worked Example 6: Multiplication (Work = Force × Distance)
+    • Inputs: (10.0 N, 0.2), (2.0 m, 0.05)
+    • Uncertainty: |10|·0.05 + |2|·0.2 = 0.5 + 0.4 = 0.9
+    • Expected result: (20.0 J, 0.9 J)
+☐ Check: manuscript shows 0.9?
+
+Worked Example 7: Biology Example (Allele Frequency)
+    • Input: p = (0.6, 0.02)
+    • Compute p²: (0.36, |0.6|·0.02 + |0.6|·0.02 = 0.024)
+    • Expected result: (0.36, 0.024)
+☐ Check: manuscript shows 0.024, not Gaussian 0.017?
+
+Dataset Alignment
+☐ Confirm text tables reflect:
+    • Addition: N/U ≥ RSS (median ratio ~1.74)
+    • Multiplication: N/U ≥ Gaussian, max ratio = √2
+    • Interval: differences ≤ 1.4×10⁻⁴ (floating-point only)
+    • Monte Carlo: N/U always ≥ empirical std
+3. Proof Formatting – Worksheet
+General Checks
+☐ All Theorems, Lemmas, Propositions are numbered sequentially.
+☐ Statements (theorem text) appear in italics.
+☐ Each proof begins with Proof. (italicized).
+☐ Each proof ends with a □ (QED box).
+
+Proof: Closure
+    • Statement: Show (n,u)∈A stays in A under ⊕, ⊗, ⊙.
+    • Expectation: Nonnegativity preserved, reals preserved.
+☐ Check: text shows both nominal and uncertainty arguments explicitly.
+☐ Check: uncertainty terms always written with absolute values.
+
+Proof: Commutativity
+    • Expectation: Both ⊕ and ⊗ are symmetric in arguments.
+☐ Check: text includes equalities showing symmetry (e.g. |n₁|u₂ + |n₂|u₁ = |n₂|u₁ + |n₁|u₂).
+
+Proof: Associativity
+    • Expectation: Explicit derivation of (x⊗y)⊗z = x⊗(y⊗z).
+☐ Check: uses corrected rule with absolute values.
+☐ Check: no claims that multiplication is “not associative.”
+
+Proof: Identity Elements
+    • Additive identity: (0,0).
+    • Multiplicative identity: (1,0).
+☐ Check: both are shown with full calculation.
+
+Proof: Sub-Distributivity
+    • Expectation: x⊗(y⊕z) ⪯ (x⊗y) ⊕ (x⊗z).
+☐ Check: nominal equality, uncertainty inequality via |b+c| ≤ |b|+|c|.
+
+Proof: Monotonicity
+    • Expectation: If uᵢ ≤ vᵢ then outputs respect inequality.
+☐ Check: argument spelled out for both ⊕ and ⊗.
+
+Proof: Catch & Flip Invariants
+    • Expectation: M(n,u) = |n|+u preserved.
+☐ Check: Catch collapses correctly.
+☐ Check: Flip defined as (u,|n|), with note that it is no longer an involution.
+
+4. Literature Review – Worksheet
+Reference Count
+☐ Total references = 40–60 (count manually).
+Classic Foundations
+☐ Taylor (error analysis).
+☐ Bevington (error analysis).
+☐ Moore (interval analysis).
+☐ ISO GUM (2008).
+Modern Applied
+☐ Bomarito et al. (multi-model Monte Carlo).
+☐ Callens et al. (interval QMC).
+☐ Cicirello & Giunta (ML + interval).
+☐ Zhang et al. (Bayesian sensitivity).
+☐ Wei & Liu (Bayesian interval).
+☐ Valdebenito (fuzzy reduced order).
+☐ Sundar & Shields (ML + kriging).
+☐ Song et al. (mixed uncertainty).
+☐ Cross-check: every in-text citation matches bibliography entry.
+☐ Confirm: comparison table present with complexity, pros/cons, convergence.
+
+5. Applications – Worksheet
+Case 1: Simple Aggregation
+☐ Check: example shows summing measurement errors.
+☐ Verify uncertainty total = sum of inputs.
+☐ Confirm manuscript compares N/U with Gaussian RSS (larger, conservative).
+Case 2: Engineering Stress/Strain
+☐ Check: inputs clearly specified (force, distance, load).
+☐ Verify N/U propagation shown alongside Gaussian/interval.
+☐ Ensure engineering units are consistent (N, m, J, etc.).
+Case 3: High-Dimensional Synthetic Chain
+☐ Check: chain product calculations match dataset (stable, no explosion).
+☐ Verify summary table matches (ratios ~1 within FP error).
+
+Expansion to Full Case Study
+☐ Select one application (probably engineering stress/strain).
+☐ Add: figure (schematic or plot).
+☐ Add: side-by-side comparison table with N/U, Gaussian, MC, Interval.
+☐ Provide: narrative on practical significance (e.g., fail/safe design margins).
+
+Final Polish – Worksheet
+☐ Title: neutral + optional Falcon subtitle.
+☐ Abstract: ≤250 words, no equations/citations.
+☐ Keywords: 4–7.
+☐ MSC codes: at least one primary (65G30) and one secondary.
+☐ Theorem formatting consistent.
+☐ References formatted consistently.
+☐ No dangling claims like “100% safe.”

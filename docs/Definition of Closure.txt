@@ -1,0 +1,349 @@
+Definition of Closure (8th–grade friendly)
+
+Closure means:
+When you do an operation (like add or multiply) inside a system, you always land back inside the system.
+
+Example: If you start with whole numbers and add them (2+3=5), you still get a whole number. That means whole numbers are “closed under addition.”
+
+For N/U Algebra, the “system” is all pairs 
+(
+𝑛
+,
+𝑢
+)
+(n,u) where 
+𝑛
+n is any real number and 
+𝑢
+u is always nonnegative.
+
+𝐴
+=
+𝑅
+×
+𝑅
+≥
+0
+.
+A=R×R
+≥0
+	​
+
+.
+How it applies to your operators
+
+Addition (⊕):
+
+(
+𝑛
+1
+,
+𝑢
+1
+)
+⊕
+(
+𝑛
+2
+,
+𝑢
+2
+)
+=
+(
+𝑛
+1
++
+𝑛
+2
+,
+𝑢
+1
++
+𝑢
+2
+)
+(n
+1
+	​
+
+,u
+1
+	​
+
+)⊕(n
+2
+	​
+
+,u
+2
+	​
+
+)=(n
+1
+	​
+
++n
+2
+	​
+
+,u
+1
+	​
+
++u
+2
+	​
+
+).
+
+𝑛
+1
++
+𝑛
+2
+n
+1
+	​
+
++n
+2
+	​
+
+ is still a real number.
+
+𝑢
+1
++
+𝑢
+2
+u
+1
+	​
+
++u
+2
+	​
+
+ is still nonnegative.
+✅ So addition stays closed.
+
+Multiplication (⊗):
+
+(
+𝑛
+1
+,
+𝑢
+1
+)
+⊗
+(
+𝑛
+2
+,
+𝑢
+2
+)
+=
+(
+𝑛
+1
+𝑛
+2
+,
+  
+∣
+𝑛
+1
+∣
+𝑢
+2
++
+∣
+𝑛
+2
+∣
+𝑢
+1
+)
+(n
+1
+	​
+
+,u
+1
+	​
+
+)⊗(n
+2
+	​
+
+,u
+2
+	​
+
+)=(n
+1
+	​
+
+n
+2
+	​
+
+,∣n
+1
+	​
+
+∣u
+2
+	​
+
++∣n
+2
+	​
+
+∣u
+1
+	​
+
+).
+
+𝑛
+1
+𝑛
+2
+n
+1
+	​
+
+n
+2
+	​
+
+ is still a real number.
+
+∣
+𝑛
+1
+∣
+𝑢
+2
++
+∣
+𝑛
+2
+∣
+𝑢
+1
+∣n
+1
+	​
+
+∣u
+2
+	​
+
++∣n
+2
+	​
+
+∣u
+1
+	​
+
+ is nonnegative (because absolute values and 
+𝑢
+u’s are nonnegative).
+✅ So multiplication stays closed.
+
+Scalar multiplication (⊙):
+
+𝑎
+⊙
+(
+𝑛
+,
+𝑢
+)
+=
+(
+𝑎
+𝑛
+,
+  
+∣
+𝑎
+∣
+𝑢
+)
+a⊙(n,u)=(an,∣a∣u).
+
+𝑎
+𝑛
+an is a real number.
+
+∣
+𝑎
+∣
+𝑢
+∣a∣u is nonnegative.
+✅ So scalar multiplication stays closed.
+
+Catch (C):
+
+𝐶
+(
+𝑛
+,
+𝑢
+)
+=
+(
+0
+,
+  
+∣
+𝑛
+∣
++
+𝑢
+)
+C(n,u)=(0,∣n∣+u).
+
+0 is a real number.
+
+∣
+𝑛
+∣
++
+𝑢
+∣n∣+u is nonnegative.
+✅ So Catch stays closed.
+
+Flip (B):
+Safe version: 
+𝐵
+(
+𝑛
+,
+𝑢
+)
+=
+(
+𝑢
+,
+∣
+𝑛
+∣
+)
+B(n,u)=(u,∣n∣).
+
+𝑢
+u is a real number (since all real numbers are included).
+
+∣
+𝑛
+∣
+∣n∣ is nonnegative.
+✅ So Flip stays closed (but no longer an involution).

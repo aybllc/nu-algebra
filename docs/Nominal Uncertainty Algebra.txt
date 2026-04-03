@@ -1,0 +1,247 @@
+Nominal Uncertainty Algebra: A Conservative Framework for Uncertainty Propagation 
+
+Authors: Eric D. Martin 
+
+Abstract 
+
+Quantifying and propagating uncertainty is fundamental science and engineering practice. Existing methods—Gaussian error propagation, Monte Carlo, interval arithmetic, polynomial chaos, fuzzy arithmetic, probability bounds, and evidence theory—each have tradeoffs (Taylor, 1997; McKay, Beckman, & Conover, 1979; Moore, Kearfott, & Cloud, 2009; Xiu & Karniadakis, 2002; Zadeh, 1965; Shafer, 1976; Faes, Daub, Marelli, Patelli, & Beer, 2021). We introduce Nominal/Uncertainty Algebra (N/U Algebra): a conservative, transparent framework designed for naive first-round, high-stakes decisions. Each value is represented as an ordered pair (n,u) with n ∈ ℝ, u ≥ 0. Closed operations are defined for addition, multiplication, and scalar multiplication, with special operators (Catch Ca, Flip B) that conserve total magnitude M = |n|+u. We prove closure, commutativity, identity, monotonicity, conservation, cumulative formulas, and a sub-distributive bound. N/U Algebra is assumption-light, lean, auditable, and particularly suited for go/no-go contexts where underestimating uncertainty is unacceptable. 
+
+Keywords: uncertainty propagation; conservative bounds; algebraic frameworks; safety-critical decision-making; reproducibility 
+
+ 
+
+ 
+
+Introduction 
+
+Scientific and engineering practice abounds with the need to quantify and propagate uncertainties. From the design of a spacecraft to the control of a nuclear plant or the calibration of medical equipment, one needs to have confidence that the built-in safety margins of error will not be exceeded. A panoply of well-established approaches is available, from Gaussian error propagation to Monte Carlo simulation and probability bounds analysis. Each of these has its merits, but each has its weaknesses. 
+
+We present here an approach called Nominal/Uncertainty Algebra (N/U Algebra) that is expressly designed for deliberately conservative, naive, first-round, high-stakes, go/no-go decisions. The algebra is parsimonious in rules, makes few assumptions, and is auditable. Above all, it is designed never to underestimate uncertainty, even if it must occasionally be pessimistic as a result. We define the algebra, prove the main theorems, and show how it relates to other approaches for uncertainty quantification. 
+
+Background / Preliminaries 
+
+Uncertainty propagation is a central aspect of the scientific method. The law of propagation of uncertainty (Δ-method) states that, if the errors are small and the input are independent, the variance of a response is expressible as a quadratic function of the sensitivity coefficients and the input variances (Taylor, 1997; Bevington & Robinson, 2003). This concept was subsequently codified into the Guide to the Expression of Uncertainty in Measurement (GUM) standard (ISO/IEC, 2008) and is a limiting case of many methods. 
+
+Monte Carlo (MC) simulation methods sample input realizations and propagate them through the models (McKay et al., 1979). Stratified and low-discrepancy variants, such as Latin Hypercube Sampling (LHS) and Quasi-Monte Carlo (QMC), improve convergence rates (Niederreiter, 1992; Dick & Pillichshammer, 2010). MC methods are flexible but are often computationally expensive and are sometimes inappropriate for supporting time-critical decisions. 
+
+Interval arithmetic methods propagate upper and lower bounds instead of probabilities. The true values of the quantities of interest are guaranteed to lie in the computed interval enclosure, but the latter can be large overestimates, especially in the presence of dependencies between variables (Moore et al., 2009). 
+
+Polynomial chaos expansion (PCE) approximates the stochastic response by an expansion in terms of orthogonal polynomial basis functions (Xiu & Karniadakis, 2002). PCE is computationally efficient for some problems, but the method is strongly dependent on the assumed distribution of the inputs. 
+
+Probability boxes (p-boxes) (Ferson, Kreinovich, Ginzburg, Myers, & Sentz, 2003; Ferson, 2006) and Probability Bounds Analysis (PBA) (Faes et al., 2021; Iskandar, 2021) bound the distributions of the quantities of interest by upper and lower cumulative distribution functions (CDFs). Methods exist for propagating interval and stochastic inputs without committing to specific probability laws, but PBA methods are computationally expensive. 
+
+A different stream of methods embraces the vagueness of uncertainty rather than its stochasticity using fuzzy sets and fuzzy arithmetic (Zadeh, 1965; Hanss, 2005). A fuzzy variable is defined by a membership function μ(x)∈[0,1]; fuzzy arithmetic is often done with α-cuts: for each α∈[0,1], intervals Xα and Yα are formed and set operations (e.g. Xα+Yα) are applied to reconstitute the resulting fuzzy set. Fuzzy methods are prevalent in civil, structural, and mechanical engineering problems where uncertainty is epistemic, but like interval arithmetic they can lead to overly wide bounds in the presence of strong dependencies. 
+
+Another family of methods is Dempster–Shafer evidence theory, in which uncertainty is characterized by belief and plausibility functions that bound probabilities: Bel(A) ≤ P(A) ≤ Pl(A) for all events A (Shafer, 1976). Evidence theory generalizes probability by allowing for partial information and the combination of conflicting evidence; it has conceptual overlap with PBAs and probability boxes in the way it bounds distribution functions (Ferson et al., 2003). These methods are powerful but can be costly to apply in large systems. 
+
+ The wide range of methods reviewed above highlights a fundamental tradeoff between assumptions, cost, and conservatism. Gaussian and spectral methods can lead to underestimation; Monte Carlo and PBA methods can be infeasible; interval arithmetic can be intractably conservative. Against this backdrop of difficult choices, Nominal/Uncertainty Algebra (NUA) provides a simple alternative. Because it operates on pairs (n,u) with closed algebraic rules, NUA is both extremely fast and reproducible, while making few assumptions. NUA is designed so that uncertainty never shrinks, which makes it well-suited to naive first-round, high-stakes go/no-go decisions where probabilistic optimality is not the primary objective, but safety and reproducibility are. 
+
+Comparison of Methods 
+
+Gaussian Δ-method (Δy)² ≈ Σᵢ (∂y/∂xᵢ)² (Δxᵢ)²  
+
+Small errors linearity, independence, simple, analytic, underestimates if 	assumptions fail. 
+
+Monte Carlo (MC) ŷ^(k) = g(x^(k)), uncertainty = sample variance of {ŷ^(k)}  
+
+Distributional sampling and flexible, general, computationally costly. 
+
+LHS / QMC Stratified or low-discrepancy sampling; x^(k) = Φ^(-1)(u^(k))  
+
+Known distributions Faster convergence than MC Setup complexity 
+
+Interval arithmetic X·Y = [min(ac,ad,bc,bd), max(ac,ad,bc,bd)]  
+
+None Guaranteed enclosure Overestimation (dependency) 
+
+Polynomial Chaos (PCE) y(ξ) = Σᵢ cᵢ Ψᵢ(ξ)  
+
+Input distribution known Efficient, accurate Assumption-heavy 
+
+P-boxes / PBA F_lower(x) ≤ P(X ≤ x) ≤ F_upper(x)  
+
+Partial CDF bounds Rigorous under uncertainty Computationally expensive 
+
+Fuzzy arithmetic (X ⊕ Y)_α = [x⁻_α+y⁻_α, x⁺_α+y⁺_α]  
+
+Membership functions Intuitive, handles vagueness Often conservative 
+
+ 
+
+Dempster–Shafer Bel(A) ≤ P(A) ≤ Pl(A) 
+
+Evidence assignments Generalizes probability Complex combination rules 
+
+ 
+
+N/U Algebra (n₁,u₁) ⊕ (n₂,u₂) = (n₁+n₂, u₁+u₂), etc.  
+
+None Lean, auditable, conservative Cannot reduce uncertainty 
+
+Lexicon  
+
+ Sets: ℝ (reals); ℝ_{≥0} (nonnegative reals).  
+
+ N/U pair: (n,u) ∈ ℝ × ℝ_{≥0}, nominal n, uncertainty u.  
+
+ Operators: ⊕ (pairwise addition), ⊗ (pairwise multiplication), ⊙ (scalar multiplication).  
+
+ Special operators: Catch Ca(n,u) = (0, |n|+u); Flip B(n,u) = (u,n).  
+
+ Invariant: M(n,u) = |n|+u.  
+
+ Identities: additive (0,0), multiplicative (1,0).  
+
+ Cumulative: ⨁, ⨂ for finite families of N/U pairs.  
+
+ Order on pairs: (n,u) ≼ (n′,u′) means n = n′ and u ≤ u′. 
+
+ Methodology / Approach  
+
+ Formal object of study  
+
+ Let 𝒜 ≔ ℝ × ℝ_{≥0}. Elements of 𝒜 are N/U pairs (n,u), with n the nominal value and u a nonnegative explicit uncertainty. 
+
+ Core operations (closed on 𝒜)  
+
+ (n₁,u₁) ⊕ (n₂,u₂) = (n₁ + n₂, u₁ + u₂)  
+
+(n₁,u₁) ⊗ (n₂,u₂) = (n₁ · n₂, |n₁| · u₂ + |n₂| · u₁) 
+
+ a ⊙ (n,u) = (a · n, |a| · u), a ∈ ℝ  
+
+Identity elements  
+
+ The additive identity is (0,0); the multiplicative identity is (1,0). 
+
+ Special operators and conservation  
+
+ Ca(n,u) = (0, |n| + u)  
+
+ B(n,u) = (u, n)  
+
+ M(n,u) = |n| + u  
+
+ Cumulative rules (finite families)  
+
+ ⨁ᵢ₌₁ᵐ (nᵢ,uᵢ) = (Σᵢ₌₁ᵐ nᵢ, Σᵢ₌₁ᵐ uᵢ)  
+
+ ⨂ᵢ₌₁ᵐ (nᵢ,uᵢ) = (Πᵢ₌₁ᵐ nᵢ, Σᵢ₌₁ᵐ uᵢ · Πⱼ≠ᵢ |nⱼ|) 
+
+Design principles 
+
+The algebra is engineered so as to (i) remain closed on 𝒜; (ii) be commutative and associative under ⊕, ⊗; (iii) ensure monotonicity of uncertainty (increasing any input uᵢ cannot decrease any output uncertainty); and (iv) provide auditable aggregation via the cumulative formulas above. External distributional machinery may be used for comparison, but the algebra itself is distribution-free. 
+
+Proofs 
+
+Theorem 1 (Closure). (𝒜, ⊕, ⊗, ⊙) is closed: applying any defined operation to elements of 𝒜 yields an element of 𝒜. 
+
+Proof. For ⊕, the nominal sum is real and u₁+u₂ ≥ 0. For ⊗, the nominal product is real and |n₁|u₂ + |n₂|u₁ ≥ 0. For ⊙, (a n, |a| u) ∈ 𝒜 for any a ∈ ℝ. 
+
+Theorem 2 (Identities and inverses where defined). (0,0) is the additive identity and (1,0) the multiplicative identity. Additive inverses exist for the nominal component but not for uncertainty (which must remain nonnegative). 
+
+Proof. Immediate from the definitions: (n,u) ⊕ (0,0) = (n,u) and (n,u) ⊗ (1,0) = (n,u). There is no (x,y) with y ≥ 0 such that u ⊕ y = 0 unless u = 0. 
+
+Theorem 3 (Commutativity). ⊕ and ⊗ are commutative. 
+
+Proof. Real addition/multiplication commute; the uncertainty terms are symmetric: |n₁|u₂ + |n₂|u₁ = |n₂|u₁ + |n₁|u₂. 
+
+Theorem 4 (Associativity). ⊕ and ⊗ are associative. 
+
+Proof. ⊕ is associative by real addition. For ⊗, let x=(a,A), y=(b,B), z=(c,C): 
+
+(x ⊗ y) ⊗ z = (ab, |a|B + |b|A) ⊗ (c,C) = (abc, |ab|C + |c|(|a|B + |b|A)) = (abc, |ab|C + |ac|B + |bc|A) 
+
+x ⊗ (y ⊗ z) = (a,A) ⊗ (bc, |b|C + |c|B) = (abc, |a|(|b|C + |c|B) + |bc|A) = (abc, |ab|C + |ac|B + |bc|A) 
+
+The uncertainty components coincide, so associativity holds. 
+
+Theorem 5 (Scalar compatibility). For all a ∈ ℝ: 
+
+a ⊙ ((n₁,u₁) ⊕ (n₂,u₂)) = (a ⊙ (n₁,u₁)) ⊕ (a ⊙ (n₂,u₂)) 
+
+a ⊙ ((n₁,u₁) ⊗ (n₂,u₂)) = (a ⊙ (n₁,u₁)) ⊗ (n₂,u₂) 
+
+Proof. Direct calculation with |a| on the uncertainty component. 
+
+Theorem 6 (Monotonicity of uncertainty). Fix nominals. If uᵢ ≤ vᵢ (componentwise) then, for each operation, the output uncertainty with inputs vᵢ is ≥ the output uncertainty with inputs uᵢ. 
+
+Proof. In ⊕, uncertainty is u₁+u₂. In ⊗, it is a nonnegative linear combination |n₁|u₂ + |n₂|u₁. In ⊙, it is |a|u. All are monotone in each uᵢ. 
+
+Theorem 7 (Cumulative formulas). For {(nᵢ,uᵢ)}ᵢ₌₁ᵐ ⊂ 𝒜: 
+
+⨁ᵢ₌₁ᵐ (nᵢ,uᵢ) = (Σᵢ nᵢ, Σᵢ uᵢ) 
+
+⨂ᵢ₌₁ᵐ (nᵢ,uᵢ) = (Πᵢ nᵢ, Σᵢ uᵢ · Πⱼ≠ᵢ |nⱼ|) 
+
+Proof. The sum is immediate by induction. For the product, assume the claim for m and multiply by (nₘ₊₁,uₘ₊₁); the new uncertainty splits into |Πᵢ₌₁ᵐ nᵢ| uₘ₊₁ plus |nₘ₊₁| times the existing sum, yielding the stated form. 
+
+Theorem 8 (Catch/Flip invariants and idempotences). M(n,u)=|n|+u is conserved by Ca and B. Moreover, Ca is idempotent and B is an involution: 
+
+M(Ca(n,u)) = M(n,u) M(B(n,u)) = M(n,u) Ca(Ca(n,u)) = Ca(n,u) B(B(n,u)) = (n,u) 
+
+Proof. M(Ca(n,u)) = |0| + (|n|+u) = |n|+u. M(B(n,u)) = |u| + n = |n|+u since u ≥ 0. Idempotence and involution follow by direct substitution. 
+
+Proposition 1 (Subdistributivity upper bound). For all x,y,z ∈ 𝒜, 
+
+x ⊗ (y ⊕ z) ≼ (x ⊗ y) ⊕ (x ⊗ z) 
+
+where ≼ means equality on nominals and ≤ on uncertainties. 
+
+Proof. Let x=(a,A), y=(b,B), z=(c,C). Both sides have nominal ab+ac. Uncertainties satisfy |a|(B+C)+|b+c|A ≤ |a|(B+C)+(|b|+|c|)A by |b+c| ≤ |b|+|c|.  
+
+Results 
+
+(Reserved. To be completed once testing and worked examples are run.) 
+
+Discussion 
+
+This comparison makes clear that N/U Algebra is best understood as an orthogonal approach. It is as conservative as interval or fuzzy arithmetic but doesn’t suffer from dependency explosion, being strictly linear in the uncertainty terms (Moore, Kearfott, & Cloud, 2009; Hanss, 2005). It bounds without assuming distributions, unlike Gaussian or PCE methods (Taylor, 1997; Xiu & Karniadakis, 2002). It is vastly less computationally expensive than Monte Carlo, PBA, or evidence theory (McKay, Beckman, & Conover, 1979; Faes, Daub, Marelli, Patelli, & Beer, 2021; Shafer, 1976). 
+
+Its primary limitation—its inability to shrink uncertainties—is just a consequence of the design principle that it’s a fail-safe first pass. Hybrid use cases are to be expected: use N/U Algebra to do triage for go/no-go decisions, then refine later with Monte Carlo, PCE, or PBA if there’s time and information. 
+
+ If there are situations where underestimating a safety margin is catastrophic, e.g. in aerospace or AI safety, N/U Algebra gives a simple, transparent conservative algebraic backbone. It’s so simple that you can implement it in real time, with nothing more than an abacus, making it suitable for field engineers and mission controllers working under time pressure. 
+
+Ethics and Reproducibility Statements  
+
+Ethics. This work contains no human or animal subjects, personally identifiable information, or sensitive data. 
+
+ Reproducibility and Availability. The full algebra is specified in Definitions and Theorems; implementation requires only real arithmetic and absolute values. 
+
+Conflicts of Interest. The authors declare no competing interests. 
+
+ 
+
+References 
+
+Bevington, P. R., & Robinson, D. K. (2003). Data reduction and error analysis for the physical sciences (3rd ed.). McGraw-Hill. 
+
+Dick, J., & Pillichshammer, F. (2010). Digital nets and sequences: Discrepancy theory and quasi-Monte Carlo methods. Cambridge University Press. 
+
+Faes, M. G. R., Daub, M., Marelli, S., Patelli, E., & Beer, M. (2021). Engineering analysis with probability boxes: A review on computational methods. Structural Safety, 93, 102092. https://doi.org/10.1016/j.strusafe.2021.102092 
+
+Ferson, S. (2006). Sensitivity analysis using probability bounding. Reliability Engineering & System Safety, 91(10–11), 1414–1421. https://doi.org/10.1016/j.ress.2005.11.054 
+
+Ferson, S., Kreinovich, V., Ginzburg, L., Myers, D. S., & Sentz, K. (2003). Constructing probability boxes and Dempster–Shafer structures. Sandia National Laboratories Report SAND2002-4015. https://doi.org/10.2172/809602 
+
+Hanss, M. (2005). Applied fuzzy arithmetic: An introduction with engineering applications. Springer. 
+
+Iskandar, R. (2021). Probability bound analysis: A novel approach for quantifying parameter uncertainty in decision-analytic modeling and cost-effectiveness analysis. Statistics in Medicine, 40(6), 1402–1417. https://doi.org/10.1002/sim.9195 
+
+ISO/IEC. (2008). Guide to the expression of uncertainty in measurement. International Organization for Standardization. 
+
+McKay, M. D., Beckman, R. J., & Conover, W. J. (1979). A comparison of three methods for selecting values of input variables in the analysis of output from a computer code. Technometrics, 21(2), 239–245. https://doi.org/10.2307/1268522 
+
+Moore, R. E., Kearfott, R. B., & Cloud, M. J. (2009). Introduction to interval analysis. SIAM. 
+
+Niederreiter, H. (1992). Random number generation and quasi-Monte Carlo methods. SIAM. 
+
+Shafer, G. (1976). A mathematical theory of evidence. Princeton University Press. 
+
+Taylor, J. R. (1997). An introduction to error analysis: The study of uncertainties in physical measurements (2nd ed.). University Science Books. 
+
+Xiu, D., & Karniadakis, G. E. (2002). The Wiener–Askey polynomial chaos for stochastic differential equations. SIAM Journal on Scientific Computing, 24(2), 619–644. https://doi.org/10.1137/S1064827501387826 
+
+Zadeh, L. A. (1965). Fuzzy sets. Information and Control, 8(3), 338–353. https://doi.org/10.1016/S0019-9958(65)90241-X 
+
+ 

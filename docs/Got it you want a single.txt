@@ -1,0 +1,102 @@
+Got it — you want a **single source of truth (SSOT)** checklist of what still needs to be corrected in the manuscript, organized by category. Here’s a structured breakdown based on the standards from journal best practicesand the issues spotted in your drafts:
+
+---
+
+## Typography
+
+* Replace all ASCII hacks with **proper Unicode/LaTeX math symbols**:
+
+  * `R>=0` → ℝ≥0
+  * `abs()` → |·|
+  * `->` or `=>` → ⇒
+  * Use ⊗, ⊕, ⊙ consistently instead of “x” or “*”.
+* Ensure **italics for variables and functions**, roman for operators/constants.
+* Enforce **nonbreaking spaces** between number and unit (e.g., `3.20 V` not `3.20V`).
+* Replace any `/alpha`-style placeholders with true Greek letters (α, β, etc.).
+
+---
+
+## Formatting
+
+* Abstract must be ≤250 words, single paragraph, no equations/citations.
+* Add **4–7 keywords** and **MSC codes** (e.g., 65G30, 65C05, 62F35 already appear in v3.4).
+* All theorems, lemmas, propositions formatted AMS-style: bold header, italic statement, proofs ending with □.
+* Figures/tables: ensure captions are descriptive, not just labels.
+* Move personal narrative (Author’s Note, oMMP, OAC story) to **Acknowledgments or separate companion note**.
+
+---
+
+## Sources & Attributions
+
+* Expand literature review to at least 40–60 references (currently ~20–25).
+* Cite **standard textbooks** for foundational math (Rudin, Moore, JCGM) rather than original historical notes.
+* Ensure all modern (5–10 years) competing methods are cited (Bayesian, hybrid, ML-based UQ).
+* Attribute clearly which results are **replications vs. novel contributions** (e.g., interval arithmetic comparisons vs. N/U algebra proofs).
+* Move self-authored frameworks (oMMP, AIWared, UNTheory) to **supplemental material**; keep the main text discipline-agnostic.
+
+---
+
+## Mathematics
+
+* Multiplication rule: restore absolute values:
+  (n₁,u₁)⊗(n₂,u₂) = (n₁n₂, |n₁|u₂ + |n₂|u₁).
+* Remove “multiplication not strictly associative” claim; replace with full associativity proof.
+* Flip operator: redefine as B(n,u) = (u, |n|) to preserve ℝ×ℝ≥0 and invariant M = |n|+u.
+* State explicitly: B is **not an involution** under this definition, but preserves closure and invariants.
+* Update all worked examples (100±10⊗200±5, interval comparisons, chain multiplications) with corrected numbers (e.g., uncertainty = 2500 not 3000).
+* Insert cumulative product theorem (general form for ⨂ over m terms).
+* Ensure monotonicity and sub-distributivity proofs are written in lemma-theorem style.
+
+---
+
+## Discussion
+
+* Emphasize **conservatism vs. usability** (N/U avoids interval explosion but remains ≥ Gaussian/MC).
+* Clarify **limitations**: no covariance tracking, conservative ratchet effect, not for final precision reporting.
+* Compare clearly with:
+
+  * Interval arithmetic (conservatism, explosion)
+  * Monte Carlo (stochastic, costly, but precise)
+  * Polynomial Chaos (efficient but distribution-dependent)
+  * Fuzzy sets & Dempster-Shafer (epistemic uncertainty)
+* Remove autobiographical elements from core discussion; place in acknowledgments.
+
+---
+
+## Methods
+
+* Define carrier set 𝒜 = ℝ×ℝ≥0, invariants, operators with rigorous axioms.
+* Show closure, commutativity, associativity, identity, monotonicity as Theorems with full proofs.
+* Include **computational complexity analysis**: O(1) per operation, O(m) for m-term product.
+* Add Lipschitz lifting subsection for propagating through functions.
+* Explicitly state conservation laws for Catch and Flip, and give proofs.
+
+---
+
+## Experiments
+
+* Recompute **all tables** with corrected multiplication (absolute values).
+* Ensure consistency with **interval arithmetic benchmarks** (interval half-width vs N/U match for n≥0).
+* Report **Monte Carlo comparison margins**: N/U ≥ empirical std always.
+* Report **chain experiment stability**: N/U tracks interval within machine epsilon.
+* Document **seeds, tolerances, configs** (already present in summary.json, but must be referenced explicitly in text).
+* Provide at least 20 test problems across multiple domains: physical sciences, engineering, biology, synthetic.
+
+---
+
+## Everything Else
+
+* Add **data & code availability statement** (Zenodo/OSF DOI).
+* Add **conflict of interest, ethics, funding** statements.
+* Add **appendices** for extended proofs, technical lemmas, reproducibility details.
+* Include **comparison tables**:
+
+  * Method assumptions, complexity, conservatism, convergence, audit readiness.
+* Conform to page limit norms (~20–25 pages for SIAM style).
+
+---
+
+This checklist is the master SSOT. Once all of these categories are satisfied, I can translate the whole into a LaTeX manuscript that is journal-ready.
+
+Do you want me to expand this into a **tracker table** (columns: “Category | Task | Status | Notes”), so you can literally check them off as you edit?
+
