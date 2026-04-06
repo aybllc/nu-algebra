@@ -45,11 +45,11 @@ This is the **definitive SSOT** for all identified discrepancies, gaps, and cros
 
 > These must be resolved before any publication, deployment, or external adoption.
 
-**CRITICAL-1 — F-002:** `FlipInvolutive.lean` proves a **false theorem**. `B² = id` contradicts the NASA Paper's own Definition 3.2. Formal verification system is certifying incorrect mathematics.
+**~~CRITICAL-1 — F-002~~** ✅ RESOLVED (2026-04-05): Finding was based on conflating two distinct operators. The Lean `flip` operator is `(-n, u)` (negation) — it IS involutive and the theorem is correct. The NASA Paper's `B` operator is `(u, |n|)` (swap) — it is NOT involutive, and its correct property is B³=B (period-2 cycle). Both operators now defined in NUCore.lean. Four theorems added to FlipInvolutive.lean: `swapFlip_not_involutive_general`, `swapFlip_sq`, `swapFlip_period_two`, `swapFlip_sq_idempotent`. No false theorems remain. Verified 2026-04-05.
 
-**CRITICAL-2 — F-003:** `Enclosure.lean` contains `sorry` placeholders. The PAC coverage theorem (o1 Theorem 9) rests on an **unverified formal foundation**.
+**~~CRITICAL-2 — F-003~~** ✅ RESOLVED (2025-10-20): `Enclosure.lean` contains zero `sorry` statements. File completed before this SSOT was written. PAC coverage theorem formally proven. Finding was stale at time of SSOT authorship — auditor did not read current file state. Verified 2026-04-05.
 
-**CRITICAL-3 — F-038:** Four layer specification documents (`NULedger_SPEC.md`, `NUGuard_POLICY.md`, `NUPolicy_SPEC.md`, `NUGovern_API.md`) are **completely absent**. No external eBIOS implementation is possible without them.
+**~~CRITICAL-3 — F-038~~** ✅ RESOLVED (stale finding): All four files exist in `/scratch/repos/ebios/docs/` — `NULedger_SPEC.md`, `NUGuard_POLICY.md`, `NUPolicy_SPEC.md`, `NUGovern_API.md`. Files were present before this SSOT was written. Auditor did not check filesystem. Verified 2026-04-05.
 
 ---
 
