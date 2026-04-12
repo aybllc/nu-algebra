@@ -663,6 +663,136 @@ NU_mul <- function(x, y) {
 
 ---
 
+## 11. Uncertainty Propagation Order Theorem
+
+*First formalized: 2026-04-12. Arises from the critical-point failure of the first-order N/U rule.*
+
+---
+
+### 11.1 The Standard First-Order Rule (Recap)
+
+For a smooth scalar function f: ℝ → ℝ applied to an N/U pair (n, u):
+
+```
+f(n, u) ≈ (f(n), |f'(n)| · u)       [valid when f'(n) ≠ 0]
+```
+
+This is the only rule currently implemented in the N/U algebra.
+
+**Known failure mode (SSOT o1 §8.3):** When f'(n) = 0 (a *critical point* of f at n),
+the formula returns u_out = 0 — claiming perfect output precision. This is false.
+
+---
+
+### 11.2 Propagation Order Theorem
+
+**Definition — Propagation Order k:**
+```
+Let f be smooth at n. Define:
+  k(f, n) = min { j ≥ 1 : f^(j)(n) ≠ 0 }
+
+k is the order of the first non-zero derivative of f at n.
+```
+
+**Theorem (Uncertainty Propagation Order):**
+```
+For (n, u) ∈ A with u small, the tightest N/U-compatible bound on f(n, u) is:
+
+  u_out ≈ (1 / k!) · |f^(k)(n)| · u^k
+
+where k = k(f, n) is the propagation order.
+```
+
+**Corollary 5a (k = 1, standard):**
+```
+f'(n) ≠ 0  →  u_out ≈ |f'(n)| · u         [linear in u]
+```
+
+**Corollary 5b (k = 2, critical point):**
+```
+f'(n) = 0, f''(n) ≠ 0  →  u_out ≈ ½|f''(n)| · u²    [quadratic in u]
+```
+
+**Corollary 5c (flat point, k ≥ 3):**
+```
+f'(n) = f''(n) = 0, f'''(n) ≠ 0  →  u_out ≈ (1/6)|f'''(n)| · u³   [cubic]
+```
+
+---
+
+### 11.3 Key Consequences
+
+**Consequence 1 — Output uncertainty is O(u^k), not O(u):**
+```
+At a critical point, u_out ~ u²  (for u < 1, this is SMALLER than the first-order estimate)
+The first-order formula u_out = 0 is wrong in a specific direction:
+  it returns less uncertainty than the correct value, not more.
+  This is an overconfidence error.
+```
+
+**Consequence 2 — The invariant M does not hold across propagation order changes:**
+```
+M(n, u) = |n| + u  is conserved by C and B operators.
+But f applied at a critical point gives M(f(n), u²/2) ≠ M(n, u)
+The invariant is broken when k > 1.
+```
+
+**Consequence 3 — Canonical transcendental extensions:**
+
+| f(x) | Critical point | k | u_out |
+|------|---------------|---|-------|
+| sin(x) | x = π/2 + mπ | 2 | ½cos²(n)·u → ½u² at n=π/2 |
+| cos(x) | x = mπ | 2 | ½sin²(n)·u → ½u² at n=0 |
+| exp(x) | none | 1 | |exp(n)|·u (always first-order) |
+| x² | x = 0 | 2 | u² |
+| x³ | x = 0 | 3 | 0 (f''=0 too) → next nonzero: f'''=6 → u³ |
+
+---
+
+### 11.4 Implementation Gap
+
+The N/U algebra as of v4.0 implements **k = 1 only**.
+
+To support transcendental and nonlinear functions, the algebra needs:
+
+```python
+def propagate_uncertainty(f, f_prime, f_double_prime, n, u, tol=1e-12):
+    """
+    Compute u_out for y = f(x) at x = (n, u).
+    Returns (f(n), u_out) where u_out uses the correct propagation order.
+    """
+    if abs(f_prime(n)) > tol:
+        # k = 1: standard first-order
+        return (f(n), abs(f_prime(n)) * u)
+    elif abs(f_double_prime(n)) > tol:
+        # k = 2: critical point — quadratic compression
+        return (f(n), 0.5 * abs(f_double_prime(n)) * u**2)
+    else:
+        # k >= 3: flat point — return safe bound (not yet implemented)
+        raise NotImplementedError("k >= 3 propagation not yet implemented")
+```
+
+**Status:** Listed as future work in o1 §8.3 ("Transcendental functions (sin, exp)").
+This theorem provides the mathematical foundation for that implementation.
+
+---
+
+### 11.5 Relation to U/N Algebra
+
+U/N algebra handles second-order uncertainty *about the nominal* (epistemic uncertainty in n itself).
+The Propagation Order Theorem handles second-order *output* uncertainty when *input* uncertainty
+is mapped through a function with zero first derivative.
+
+These are distinct but complementary:
+- U/N: "I'm not sure what n is" → uncertainty in the nominal
+- Propagation Order: "I'm sure what n is, but f flattens near n" → curvature-driven output compression
+
+The bridge: if n is itself uncertain (U/N case), then the effective propagation order
+at the realized nominal is random, and the Propagation Order Theorem provides the
+per-realization bound.
+
+---
+
 ## 9. References and Sources
 
 **N/U Algebra:**
@@ -696,6 +826,9 @@ NU_mul <- function(x, y) {
 | UHA Decoding | x⃗ = ξ×R_H(a)×û | O(1) |
 | Cumulative Product | ∑ \|∏_{j≠i} nⱼ\|uᵢ | O(m) |
 | Chain Complexity | O(m) total | Linear |
+| Propagation Order k | min{j≥1: f^(j)(n)≠0} | O(1) per derivative check |
+| Critical Point u_out | ½\|f''(n)\|·u² (k=2) | O(1) |
+| General Order u_out | (1/k!)\|f^(k)(n)\|·u^k | O(1) |
 
 ---
 
