@@ -7,6 +7,7 @@
 \usepackage{array}
 \usepackage{microtype}
 \usepackage{enumitem}
+\usepackage[authoryear,round]{natbib}
 
 % Theorem environments
 \newtheorem{theorem}{Theorem}[section]
@@ -307,7 +308,7 @@ mode gaps at high persistence; this defines the operational boundary of the meth
 
 \begin{figure}[h]
 \centering
-% \includegraphics[width=0.8\textwidth]{fig_rosenbrock_trajectories.pdf}
+\includegraphics[width=0.85\textwidth]{fig1_rosenbrock_trajectories.pdf}
 \caption{\textbf{Figure 1 — Geometric Alignment.}
 Comparison of 5,000-step trajectories on the Rosenbrock density.
 PA-MCMC (orange) utilizes the persistent uncertainty payload to traverse the
@@ -318,7 +319,7 @@ exploration due to isotropic proposal collapse.}
 
 \begin{figure}[h]
 \centering
-% \includegraphics[width=0.8\textwidth]{fig_ess_scaling.pdf}
+\includegraphics[width=0.85\textwidth]{fig2_ess_scaling.pdf}
 \caption{\textbf{Figure 2 — Scaling Law.}
 ESS gain as a function of dimensionality in anisotropic Gaussian targets.
 Gains are proportional to the degeneracy fraction; as $d$ increases, the sampler
@@ -329,7 +330,7 @@ by over an order of magnitude.}
 
 \begin{figure}[h]
 \centering
-% \includegraphics[width=0.8\textwidth]{fig_efficiency_per_eval.pdf}
+\includegraphics[width=0.85\textwidth]{fig3_efficiency_per_eval.pdf}
 \caption{\textbf{Figure 3 — Efficiency Comparison.}
 Standardized efficiency measured as effective sample size (ESS) per log-likelihood
 evaluation.
@@ -340,7 +341,7 @@ information from accepted step history rather than redundant gradient evaluation
 
 \begin{figure}[h]
 \centering
-% \includegraphics[width=0.8\textwidth]{fig_multimodal_boundary.pdf}
+\includegraphics[width=0.85\textwidth]{fig4_multimodal_boundary.pdf}
 \caption{\textbf{Figure 4 — Multimodal Boundary.}
 Posterior histograms for a bimodal mixture.
 While PA-MCMC (orange) maintains distributional fidelity within each mode, high
@@ -432,7 +433,7 @@ We have established:
 This work was developed independently.
 ORCID: 0009-0006-5944-1742.
 
-\bibliographystyle{plain}
+\bibliographystyle{abbrvnat}
 \bibliography{pa_mcmc_references}
 
 \end{document}
