@@ -793,6 +793,183 @@ per-realization bound.
 
 ---
 
+### 11.6 λ–k Order Selection Theorem
+
+*Formalized: 2026-04-12. Extends the Propagation Order Theorem to multi-dimensional
+compression operators. Provides the mathematical foundation for the Scalar Collapse Framework.*
+
+---
+
+**Definition 1 — Propagation Operator P_λ:**
+```
+A propagation operator P_λ maps an uncertain input (n, u) ∈ A through a smooth
+function f: ℝ → ℝ while retaining λ dimensions of uncertainty.
+
+  P_λ[(n, u)] = (f(n), u_out)
+
+where u_out is computed from at most λ derivative terms in the Taylor expansion of f at n.
+
+Special cases:
+  λ = 0: only the nominal is tracked (pure scalar — no uncertainty propagation)
+  λ = 1: one uncertainty dimension retained (standard first-order N/U rule)
+  λ ≥ 2: higher-order terms retained
+```
+
+**Definition 2 — Representation Dimension λ:**
+```
+λ is the count of non-zero derivative orders used to compute u_out.
+Equivalently, λ is the depth of the Taylor expansion actually evaluated.
+
+A model with λ = 1 uses only f'(n). A model with λ = 0 ignores all derivatives
+(treats f(n) as a point with no uncertainty).
+```
+
+**Definition 3 — Order Selection Condition:**
+```
+For function f with propagation order k = k(f, n) = min{j ≥ 1 : f^(j)(n) ≠ 0},
+the Order Selection Condition is:
+
+  λ ≥ k - 1
+
+When satisfied: the k-th derivative term survives in u_out.
+When violated (λ < k - 1): all retained terms vanish at the critical point → u_out = 0.
+```
+
+---
+
+**Theorem 11.6 (λ–k Order Selection):**
+
+```
+Let f: ℝ → ℝ be smooth at n, with propagation order k(f, n).
+Let P_λ be a propagation operator with representation dimension λ.
+For (n, u) ∈ A with u small:
+
+  If λ ≥ k - 1:   u_out ≈ (1/k!) · |f^(k)(n)| · u^k    [non-collapse]
+  If λ < k - 1:   u_out = 0                               [scalar collapse]
+
+The minimal non-collapse condition is: λ* = k - 1
+```
+
+**Proof (sketch):**
+```
+1. Taylor Expansion:
+   Expand f(n + δ) where δ ~ Uniform(-u, u):
+     f(n + δ) = f(n) + Σ_{j=1}^{∞} (1/j!) f^(j)(n) δ^j
+
+2. Vanishing Terms:
+   By premise (propagation order k), all terms j < k vanish:
+     f^(1)(n) = f^(2)(n) = ... = f^(k-1)(n) = 0
+   The first non-vanishing term is j = k:
+     Δf ~ (1/k!) f^(k)(n) u^k
+
+3. Conservative Floor (PCU — Principle of Conservative Uncertainty):
+   The N/U algebra requires u_out > 0 whenever u > 0 and f is not identically
+   constant near n. Setting u_out = 0 at a critical point violates PCU — it
+   claims exact output precision from imprecise input.
+
+4. Order Selection:
+   Operator P_λ retains terms through the λ-th derivative order.
+   - If λ ≥ k-1: the retained expansion reaches j = k → Δf ≠ 0 → PCU preserved
+   - If λ < k-1: all retained terms vanish → Δf = 0 → PCU violated (scalar collapse)
+
+   The parameter λ is the formal index for this transition.
+   λ = 1 is the minimal requirement for curvature-aware (k=2) systems. ∎
+```
+
+---
+
+**Collapse Condition Table:**
+
+| k (order) | Condition | λ required | Collapse when |
+|-----------|-----------|------------|---------------|
+| 1 | f'(n) ≠ 0 | λ ≥ 0 | Never (standard regime) |
+| 2 | f'(n) = 0, f''(n) ≠ 0 | λ ≥ 1 | λ = 0 (scalar model) |
+| 3 | f'=f''=0, f'''≠0 | λ ≥ 2 | λ ≤ 1 |
+| k (general) | f^(j)=0 ∀j<k | λ ≥ k-1 | λ < k-1 |
+
+**Corollary 6 (Scalar Collapse Criterion):**
+```
+Any model that propagates uncertainty via λ = 0 (treats output as a point estimate)
+will produce u_out = 0 whenever f has a critical point of order k ≥ 2.
+
+Any model with λ = 1 (first-order N/U only) will produce u_out = 0 at critical
+points of order k ≥ 3.
+
+The standard first-order N/U rule (λ = 1) is NOT safe at k ≥ 3 critical points.
+```
+
+---
+
+### 11.7 Scalar Collapse Framework — Five Canonical Cases
+
+*Each case involves a widely-used model that implicitly applies λ = 0 or λ = 1
+in a regime where the physics or geometry dictates k ≥ 2.
+The result is a false zero — the model reports precision it cannot have.*
+
+| Domain | Model | The Collapse | Critical Order (k) | Result of λ < k-1 |
+|---|---|---|---|---|
+| Finance | Black-Scholes (σ) | At-the-money inflection | k=2 (Gamma) | Zero-risk illusion during price plateaus |
+| Chemistry | Arrhenius (A) | Tunneling regime | k=2 (Quantum correction) | Predicts zero reaction at low thermal energy |
+| Economics | Taylor Rule (r*/y) | Unobservable natural rate / output gap | k → undefined (latent) | Spurious precision in interest rate targets |
+| Energy | Arps Decline (b) | b–Dᵢ degeneracy (b→0) | k=2 (Curvature) | Reserve overestimation via flat likelihood fits |
+| Analytics | Bradley-Terry (P) | Rating parity (Rᵢ = Rⱼ) | k=2 (Rating density) | Inability to distinguish new vs veteran players |
+
+**Reading the table:**
+In each case, the standard model applies λ = 0 or λ = 1 at a point where k = 2.
+The minimal non-collapse upgrade is λ = k-1 = 1 (first curvature term retained).
+This is precisely what the N/U algebra provides via the Propagation Order rule.
+
+**Strategic significance:**
+- The five cases cover five industries. The failure mode is structurally identical.
+- PA-MCMC is the sampling-layer analogue: when the posterior has a degenerate
+  direction (k=2 curvature, not k=1 slope), standard MH is operating at λ=0
+  for that axis — it learns nothing from the flat direction. The payload is λ=1.
+
+---
+
+### 11.8 Bridge Lemma — Multiplication λ vs. Order Selection λ
+
+The symbol λ appears in two places in the N/U algebra. This lemma clarifies the relationship.
+
+**Multiplication λ (§1.2):**
+```
+(n₁, u₁) ⊗ (n₂, u₂) = (n₁n₂, |n₁|u₂ + |n₂|u₁ + λ_mult · u₁u₂)
+λ_mult ≥ 1:  tunable continuous safety margin for the cross-term u₁u₂
+```
+
+**Order Selection λ (§11.6):**
+```
+λ_rep ∈ {0, 1, 2, ...}: discrete representation dimension
+λ_rep = 1: first-order N/U propagation retained
+λ_rep ≥ k-1: minimal non-collapse condition
+```
+
+**Lemma (Bridge):**
+```
+The multiplication parameter λ_mult is a continuous relaxation of the discrete
+order selection parameter λ_rep.
+
+Specifically:
+  λ_mult = 1  ↔  λ_rep = 1  (standard first-order propagation; PCU at k=1 only)
+  λ_mult > 1  ↔  λ_rep ≥ 1  (additional margin; approximates k=2 curvature correction)
+
+The cross-term λ_mult · u₁u₂ in ⊗ represents the "residual" from not knowing
+whether the product n₁n₂ is at a critical point. Setting λ_mult = 1 is the minimal
+conservative choice — equivalent to the minimal non-collapse condition λ_rep = k-1 = 1.
+
+Operationally: a system that sets λ_mult = 1 in ⊗ and λ_rep = 1 in propagation
+is consistent — both use the smallest safe non-collapse parameter. Increasing
+λ_mult > 1 in ⊗ provides additional safety at the cost of wider intervals,
+consistent with a higher-order uncertainty regime.
+```
+
+**Note on notation:** The two λ parameters share a symbol intentionally: they measure
+the same underlying concept — how many dimensions of uncertainty survive a compression
+or multiplication operation. The discrete (λ_rep) and continuous (λ_mult ≥ 1) forms
+are two manifestations of the same conservation principle.
+
+---
+
 ## 9. References and Sources
 
 **N/U Algebra:**
@@ -829,6 +1006,9 @@ per-realization bound.
 | Propagation Order k | min{j≥1: f^(j)(n)≠0} | O(1) per derivative check |
 | Critical Point u_out | ½\|f''(n)\|·u² (k=2) | O(1) |
 | General Order u_out | (1/k!)\|f^(k)(n)\|·u^k | O(1) |
+| Order Selection (λ–k) | λ ≥ k-1 → non-collapse; λ < k-1 → u_out=0 | O(1) |
+| Minimal Non-Collapse | λ* = k-1 (λ=1 for k=2 systems) | O(1) |
+| Mult. λ / Selection λ | λ_mult=1 ↔ λ_rep=1 (Bridge Lemma) | — |
 
 ---
 
