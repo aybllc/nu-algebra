@@ -22,7 +22,9 @@
   Geometry-Adaptive Sampling from the N/U Uncertainty Algebra}
 
 \author{Eric D.\ Martin\\[4pt]
-  ORCID: 0009-0006-5944-1742}
+  Independent Researcher\\
+  ORCID: 0009-0006-5944-1742\\
+  \texttt{msphdba@gmail.com}}
 
 \date{April 2026}
 
@@ -55,6 +57,10 @@ Application to DESI Year 1 BAO data confirms that the DESI $w_0$--$w_a$CDM poste
 with Planck priors is not severely degenerate; the ${\sim}2.5\sigma$ dark energy
 preference is not a sampling artifact.
 \end{abstract}
+
+\noindent\textbf{Keywords:} Markov chain Monte Carlo; Adaptive MCMC; Bayesian
+computation; Sampling algorithms; Degenerate posteriors; Uncertainty algebra;
+Effective sample size.
 
 % ─────────────────────────────────────────────────────────────────────────────
 \section{Introduction}
@@ -395,6 +401,13 @@ Standard MH is sufficient when: (a) the posterior is well-conditioned (strong
 informative priors, as in the DESI+Planck case); or (b) the sampler budget is
 small enough that burn-in overhead dominates.
 
+\paragraph{Operational boundary (summary).}
+PA-MCMC is most effective in posteriors with high anisotropy and degeneracy,
+and exhibits neutral performance in well-conditioned settings—as confirmed
+by the DESI+Planck result.
+This boundary is a feature, not a limitation: it identifies exactly where
+standard MH's isotropic proposal is failing.
+
 \paragraph{Relation to Riemannian MCMC.}
 Riemannian MCMC \cite{girolami2011riemann} uses the Fisher information metric to
 warp proposal geometry, requiring gradient and Hessian evaluations at each step.
@@ -432,6 +445,22 @@ We have established:
 \section*{Acknowledgments}
 This work was developed independently.
 ORCID: 0009-0006-5944-1742.
+
+\section*{Conflict of Interest}
+The author declares no conflict of interest.
+
+\section*{Funding}
+This research received no external funding.
+
+\section*{Data and Code Availability}
+All code used to produce the results in this paper—including the PA-MCMC
+implementation, benchmark targets, ESS estimators, and figure-generation
+scripts—is available at:
+\begin{center}
+\url{https://github.com/abba-01/nu-algebra}
+\end{center}
+The DESI Year 1 BAO likelihood data are publicly available from the DESI
+collaboration \citep{desi2024bao}.
 
 \bibliographystyle{abbrvnat}
 \bibliography{pa_mcmc_references}

@@ -59,8 +59,12 @@ def count_evals(n_steps):
 def save(fig, name, dpi=150):
     path = f"{OUT_DIR}/{name}"
     fig.savefig(path, bbox_inches="tight", dpi=dpi)
+    # Also save 300 DPI PNG for journal submission
+    png_path = path.replace(".pdf", ".png")
+    fig.savefig(png_path, bbox_inches="tight", dpi=300)
     plt.close(fig)
     print(f"  saved: {path}")
+    print(f"  saved: {png_path} (300 dpi)")
 
 
 # ══════════════════════════════════════════════════════════════════════════════
