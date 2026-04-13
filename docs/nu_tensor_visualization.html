@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interpretations Comparative Matrix Analysis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f9fafb;
+            padding: 1.5rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        h1 {
+            color: #1f2937;
+            font-size: 1.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: #6b7280;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-button {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .nav-button.active {
+            background: #2563eb;
+            color: white;
+        }
+
+        .nav-button:not(.active) {
+            background: white;
+            color: #374151;
+        }
+
+        .nav-button:not(.active):hover {
+            background: #f3f4f6;
+        }
+
+        .content-panel {
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            display: none;
+        }
+
+        .content-panel.active {
+            display: block;
+        }
+
+        h2 {
+            color: #1f2937;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            padding: 1rem;
+            border-radius: 0.5rem;
+        }
+
+        .stat-card.blue { background: #dbeafe; }
+        .stat-card.purple { background: #f3e8ff; }
+        .stat-card.red { background: #fee2e2; }
+        .stat-card.green { background: #d1fae5; }
+        .stat-card.gray { background: #f3f4f6; }
+        .stat-card.orange { background: #fed7aa; }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-value {
+            font-size: 1.875rem;
+            font-weight: bold;
+        }
+
+        .stat-value.blue { color: #2563eb; }
+        .stat-value.purple { color: #7c3aed; }
+        .stat-value.red { color: #dc2626; }
+        .stat-value.green { color: #059669; }
+        .stat-value.gray { color: #6b7280; }
+        .stat-value.orange { color: #d97706; }
+
+        .chart-container {
+            margin: 1.5rem 0;
+            overflow-x: auto;
+        }
+
+        .info-box {
+            background: #f9fafb;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .info-box h3 {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-box p, .info-box ul {
+            color: #374151;
+            line-height: 1.6;
+        }
+
+        .info-box ul {
+            margin-left: 1.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .nu-pair-item {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .nu-pair-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 0.5rem;
+        }
+
+        .nu-pair-id {
+            font-weight: bold;
+            font-size: 1.125rem;
+        }
+
+        .nu-pair-label {
+            color: #6b7280;
+            margin-left: 0.5rem;
+        }
+
+        .nu-pair-value {
+            font-family: monospace;
+            font-size: 0.875rem;
+            background: #f3f4f6;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+        }
+
+        .nu-bar-container {
+            position: relative;
+            height: 2rem;
+            background: #e5e7eb;
+            border-radius: 0.25rem;
+            margin: 0.5rem 0;
+        }
+
+        .nu-bar-range {
+            position: absolute;
+            height: 100%;
+            background: #93c5fd;
+            border-radius: 0.25rem;
+        }
+
+        .nu-bar-nominal {
+            position: absolute;
+            height: 100%;
+            width: 2px;
+            background: #2563eb;
+        }
+
+        .nu-interval-text {
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
+        }
+
+        .uncertainty-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.875rem;
+            padding: 0.5rem;
+            background: #f9fafb;
+            border-radius: 0.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+
+        thead {
+            background: #f3f4f6;
+        }
+
+        th, td {
+            padding: 0.5rem;
+            text-align: left;
+        }
+
+        th {
+            font-weight: 600;
+        }
+
+        td.center, th.center {
+            text-align: center;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        tfoot tr {
+            background: #f3f4f6;
+            font-weight: bold;
+        }
+
+        .bar-chart {
+            display: flex;
+            align-items: flex-end;
+            height: 300px;
+            gap: 1rem;
+            padding: 1rem 0;
+        }
+
+        .bar-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .bar-pair {
+            display: flex;
+            gap: 0.25rem;
+            width: 100%;
+            align-items: flex-end;
+            height: 250px;
+        }
+
+        .bar {
+            flex: 1;
+            border-radius: 0.25rem 0.25rem 0 0;
+            transition: opacity 0.2s;
+        }
+
+        .bar:hover {
+            opacity: 0.8;
+        }
+
+        .bar.blue { background: #3b82f6; }
+        .bar.purple { background: #8b5cf6; }
+        .bar.green { background: #10b981; }
+        .bar.orange { background: #f59e0b; }
+
+        .bar-label {
+            font-size: 0.75rem;
+            color: #6b7280;
+            text-align: center;
+        }
+
+        .legend {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            justify-content: center;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .legend-box {
+            width: 1rem;
+            height: 1rem;
+            border-radius: 0.25rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Interpretations Comparative Matrix Analysis</h1>
+            <p class="subtitle">Real data from CSV: Quantitative comparison of Version A vs Version B findings</p>
+        </div>
+
+        <div class="nav-buttons">
+            <button class="nav-button active" data-view="scores">Score Comparison</button>
+            <button class="nav-button" data-view="uncertainty">Uncertainty Changes</button>
+            <button class="nav-button" data-view="nu-pairs">N/U Pairs</button>
+            <button class="nav-button" data-view="distribution">Distribution</button>
+        </div>
+
+        <!-- Score Comparison View -->
+        <div class="content-panel active" id="scores">
+            <h2>Ordered Score Comparison (A vs B)</h2>
+
+            <div class="stats-grid">
+                <div class="stat-card blue">
+                    <div class="stat-label">Avg Score A</div>
+                    <div class="stat-value blue">2.60</div>
+                </div>
+                <div class="stat-card purple">
+                    <div class="stat-label">Avg Score B</div>
+                    <div class="stat-value purple">2.10</div>
+                </div>
+                <div class="stat-card red">
+                    <div class="stat-label">Average Change</div>
+                    <div class="stat-value red">-0.50</div>
+                </div>
+            </div>
+
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-box blue"></div>
+                    <span>Version A</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-box purple"></div>
+                    <span>Version B</span>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <div class="bar-chart" id="score-chart"></div>
+            </div>
+
+            <div class="info-box">
+                <h3>Key Finding:</h3>
+                <p>Version B scored lower on average (-0.50 points), with 5 findings receiving reduced scores and 5 remaining unchanged. No findings scored higher in Version B.</p>
+            </div>
+        </div>
+
+        <!-- Uncertainty Changes View -->
+        <div class="content-panel" id="uncertainty">
+            <h2>Uncertainty Level Changes</h2>
+
+            <div class="stats-grid">
+                <div class="stat-card green">
+                    <div class="stat-label">Increased</div>
+                    <div class="stat-value green">9</div>
+                </div>
+                <div class="stat-card gray">
+                    <div class="stat-label">Unchanged</div>
+                    <div class="stat-value gray">1</div>
+                </div>
+                <div class="stat-card orange">
+                    <div class="stat-label">Avg Change</div>
+                    <div class="stat-value orange">+0.90</div>
+                </div>
+            </div>
+
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-box green"></div>
+                    <span>Version A</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-box orange"></div>
+                    <span>Version B</span>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <div class="bar-chart" id="uncertainty-chart"></div>
+            </div>
+
+            <div class="info-box">
+                <h3>Changes by Finding:</h3>
+                <div id="uncertainty-changes"></div>
+            </div>
+        </div>
+
+        <!-- N/U Pairs View -->
+        <div class="content-panel" id="nu-pairs">
+            <h2>N/U Pair Representation (Version B)</h2>
+
+            <div class="info-box" style="background: #dbeafe; margin-bottom: 1.5rem;">
+                <h3>What are N/U Pairs?</h3>
+                <p>Each finding is represented as (n, u) where:</p>
+                <ul>
+                    <li><strong>n</strong> = nominal value (0.30 for Low, 0.60 for Moderate, 0.90 for High)</li>
+                    <li><strong>u</strong> = uncertainty (0.05 for Low, 0.15 for Medium, 0.25 for High)</li>
+                </ul>
+            </div>
+
+            <div id="nu-pairs-list"></div>
+
+            <div class="info-box">
+                <h3>Ready for Tensor Operations</h3>
+                <p>These N/U pairs can be organized into tensors for multi-dimensional analysis. With session-level data, this structure enables:</p>
+                <ul>
+                    <li>Uncertainty propagation through arithmetic operations</li>
+                    <li>Conservative interval estimates across multiple dimensions</li>
+                    <li>Measurement precision quantification</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Distribution View -->
+        <div class="content-panel" id="distribution">
+            <h2>Score × Uncertainty Distribution (Version B)</h2>
+
+            <div class="chart-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Score</th>
+                            <th class="center">Low</th>
+                            <th class="center">Medium</th>
+                            <th class="center">High</th>
+                            <th class="center">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>3 (High)</strong></td>
+                            <td class="center">0</td>
+                            <td class="center">3</td>
+                            <td class="center">0</td>
+                            <td class="center"><strong>3</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>2 (Moderate)</strong></td>
+                            <td class="center">0</td>
+                            <td class="center">5</td>
+                            <td class="center">0</td>
+                            <td class="center"><strong>5</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>1 (Low)</strong></td>
+                            <td class="center">0</td>
+                            <td class="center">0</td>
+                            <td class="center">2</td>
+                            <td class="center"><strong>2</strong></td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td>Total</td>
+                            <td class="center">0</td>
+                            <td class="center">8</td>
+                            <td class="center">2</td>
+                            <td class="center">10</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <div class="info-box">
+                <h3>Correlation Analysis:</h3>
+                <p><strong>Moderate negative correlation</strong> between Ordered_Score and Uncertainty_Level: Lower scores tend to have higher uncertainty, indicating appropriate epistemic humility in findings with methodological limitations.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data
+        const findings = [
+            { id: 'F1', label: 'Telehealth coaching effective', scoreA: 3, scoreB: 3, uncA: 'Low', uncB: 'Medium' },
+            { id: 'F2', label: 'IDKPTM response acquired', scoreA: 3, scoreB: 3, uncA: 'Low', uncB: 'Medium' },
+            { id: 'F3', label: 'Correct answers improved', scoreA: 3, scoreB: 2, uncA: 'Medium', uncB: 'High' },
+            { id: 'F4', label: 'Question reduction accelerated', scoreA: 3, scoreB: 3, uncA: 'Low', uncB: 'Medium' },
+            { id: 'F5', label: 'Generalization occurred', scoreA: 3, scoreB: 2, uncA: 'Medium', uncB: 'High' },
+            { id: 'F6', label: 'High fidelity maintained', scoreA: 3, scoreB: 2, uncA: 'Low', uncB: 'Medium' },
+            { id: 'F7', label: 'Positive social validity', scoreA: 3, scoreB: 2, uncA: 'Low', uncB: 'Medium' },
+            { id: 'F8', label: 'Telehealth viable', scoreA: 3, scoreB: 2, uncA: 'Low', uncB: 'Medium' },
+            { id: 'F9', label: 'No control questions', scoreA: 1, scoreB: 1, uncA: 'High', uncB: 'High' },
+            { id: 'F10', label: 'Session gaps/breaks', scoreA: 1, scoreB: 1, uncA: 'Medium', uncB: 'High' }
+        ];
+
+        const uncMap = { 'Low': 1, 'Medium': 2, 'High': 3 };
+        const scoreToNominal = { 3: 0.90, 2: 0.60, 1: 0.30 };
+        const uncToU = { 'Low': 0.05, 'Medium': 0.15, 'High': 0.25 };
+
+        // Navigation
+        document.querySelectorAll('.nav-button').forEach(button => {
+            button.addEventListener('click', () => {
+                const view = button.dataset.view;
+
+                // Update button states
+                document.querySelectorAll('.nav-button').forEach(b => b.classList.remove('active'));
+                button.classList.add('active');
+
+                // Update panels
+                document.querySelectorAll('.content-panel').forEach(p => p.classList.remove('active'));
+                document.getElementById(view).classList.add('active');
+            });
+        });
+
+        // Score Comparison Chart
+        function renderScoreChart() {
+            const chart = document.getElementById('score-chart');
+            findings.forEach(f => {
+                const group = document.createElement('div');
+                group.className = 'bar-group';
+
+                const pair = document.createElement('div');
+                pair.className = 'bar-pair';
+
+                const barA = document.createElement('div');
+                barA.className = 'bar blue';
+                barA.style.height = `${(f.scoreA / 3) * 100}%`;
+                barA.title = `Version A: ${f.scoreA}`;
+
+                const barB = document.createElement('div');
+                barB.className = 'bar purple';
+                barB.style.height = `${(f.scoreB / 3) * 100}%`;
+                barB.title = `Version B: ${f.scoreB}`;
+
+                pair.appendChild(barA);
+                pair.appendChild(barB);
+
+                const label = document.createElement('div');
+                label.className = 'bar-label';
+                label.textContent = f.id;
+
+                group.appendChild(pair);
+                group.appendChild(label);
+                chart.appendChild(group);
+            });
+        }
+
+        // Uncertainty Chart
+        function renderUncertaintyChart() {
+            const chart = document.getElementById('uncertainty-chart');
+            findings.forEach(f => {
+                const group = document.createElement('div');
+                group.className = 'bar-group';
+
+                const pair = document.createElement('div');
+                pair.className = 'bar-pair';
+
+                const barA = document.createElement('div');
+                barA.className = 'bar green';
+                barA.style.height = `${(uncMap[f.uncA] / 3) * 100}%`;
+                barA.title = `Version A: ${f.uncA}`;
+
+                const barB = document.createElement('div');
+                barB.className = 'bar orange';
+                barB.style.height = `${(uncMap[f.uncB] / 3) * 100}%`;
+                barB.title = `Version B: ${f.uncB}`;
+
+                pair.appendChild(barA);
+                pair.appendChild(barB);
+
+                const label = document.createElement('div');
+                label.className = 'bar-label';
+                label.textContent = f.id;
+
+                group.appendChild(pair);
+                group.appendChild(label);
+                chart.appendChild(group);
+            });
+        }
+
+        // Uncertainty Changes
+        function renderUncertaintyChanges() {
+            const container = document.getElementById('uncertainty-changes');
+            findings.forEach(f => {
+                const arrow = uncMap[f.uncB] > uncMap[f.uncA] ? '↑' :
+                             uncMap[f.uncB] < uncMap[f.uncA] ? '↓' : '→';
+
+                const item = document.createElement('div');
+                item.className = 'uncertainty-item';
+                item.innerHTML = `
+                    <span>${f.id}: ${f.uncA} → ${f.uncB}</span>
+                    <span>${arrow}</span>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        // N/U Pairs
+        function renderNUPairs() {
+            const container = document.getElementById('nu-pairs-list');
+            findings.forEach(f => {
+                const n = scoreToNominal[f.scoreB];
+                const u = uncToU[f.uncB];
+                const lower = n - u;
+                const upper = n + u;
+
+                const item = document.createElement('div');
+                item.className = 'nu-pair-item';
+                item.innerHTML = `
+                    <div class="nu-pair-header">
+                        <div>
+                            <span class="nu-pair-id">${f.id}</span>
+                            <span class="nu-pair-label">${f.label}</span>
+                        </div>
+                        <span class="nu-pair-value">NU(${n.toFixed(2)}, ${u.toFixed(2)})</span>
+                    </div>
+                    <div class="nu-bar-container">
+                        <div class="nu-bar-range" style="left: ${lower * 100}%; width: ${(upper - lower) * 100}%"></div>
+                        <div class="nu-bar-nominal" style="left: ${n * 100}%"></div>
+                    </div>
+                    <div class="nu-interval-text">Interval: [${lower.toFixed(3)}, ${upper.toFixed(3)}]</div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        // Initialize
+        renderScoreChart();
+        renderUncertaintyChart();
+        renderUncertaintyChanges();
+        renderNUPairs();
+    </script>
+</body>
+</html>
