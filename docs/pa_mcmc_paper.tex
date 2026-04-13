@@ -196,8 +196,11 @@ The N/U multiplication safety parameter $\lambda_{\mathrm{mult}} \ge 1$
 relaxation of the discrete Order Selection dimension $\lambda_{\mathrm{rep}}$.
 Specifically: $\lambda_{\mathrm{mult}} = 1$ corresponds to $\lambda_{\mathrm{rep}} = 1$
 (first-order propagation; minimal non-collapse for $k=2$ systems).
-Both parameters measure the same conserved quantity: the number of uncertainty
-dimensions that survive a compression or multiplication operation.
+Both parameters play analogous roles in their respective frameworks, governing
+the preservation of non-zero uncertainty under composition:
+$\lambda_{\mathrm{mult}}$ governs second-order cross-term retention in products,
+while $\lambda_{\mathrm{rep}}$ governs the highest derivative order retained
+in function propagation.
 \end{lemma}
 
 % ─────────────────────────────────────────────────────────────────────────────
@@ -263,6 +266,11 @@ PA-MCMC carries a per-dimension \emph{uncertainty payload} $\mathbf{u} \in
 
 The accept-only update rule is essential: rejected proposals carry no geometric
 information at per-step resolution.
+Production acceptance rates (post-freeze) are reported separately from burn-in,
+as burn-in adaptation temporarily inflates acceptance probabilities while the
+payload contracts toward the posterior geometry.
+After freezing, acceptance stabilizes to standard MH ranges (typically 0.2--0.5
+for unimodal targets).
 The burn-in-freeze protocol satisfies the \emph{vanishing adaptation condition}
 of \citet{roberts2009examples}: because adaptation ceases entirely after the
 burn-in phase, the production kernel is fixed and detailed balance holds exactly,
@@ -395,6 +403,9 @@ PA-MCMC provides no measurable ESS gain in this setting; the DESI ${\sim}2.5\sig
 preference for dynamical dark energy is not a sampling artifact.
 PA-MCMC would show gains on the DESI posterior \emph{without} Planck priors,
 where the full degeneracy triangle would create condition number ${\gg}10$.
+This negative result serves as a validation of methodological conservatism:
+PA-MCMC does not artificially inflate posterior uncertainty when degeneracy
+is absent.
 
 % ─────────────────────────────────────────────────────────────────────────────
 \section{Discussion}

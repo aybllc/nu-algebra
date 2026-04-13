@@ -15,22 +15,17 @@ and sampling theory. None are collaborators. All have published in venues
   (Roberts & Rosenthal, JCGS)
 - Note: Do NOT suggest if the editor is Roberts himself (he is on the S&C board)
 
-**2. Jeffrey S. Rosenthal**
-- University of Toronto, Department of Statistics
-- Expertise: adaptive MCMC, AMCMC ergodicity
-- Relevance: Co-author of the Roberts & Rosenthal (2009) paper directly cited
-
-**3. Radford M. Neal**
+**2. Radford M. Neal**
 - University of Toronto, Department of Statistics and Computer Science
 - Expertise: HMC, slice sampling, MCMC variance reduction
 - Relevance: Geometry-aware sampling; PA-MCMC as gradient-free alternative to HMC
 
-**4. Christian Robert**
+**3. Christian Robert**
 - Université Paris-Dauphine / University of Warwick
 - Expertise: computational Bayesian methods, MCMC theory
 - Relevance: Broad MCMC scope; familiar with adaptive methods and ESS diagnostics
 
-**5. Michael Betancourt**
+**4. Michael Betancourt**
 - Independent (formerly Stanford/Columbia)
 - Expertise: differential geometry in MCMC, Stan, Riemannian HMC
 - Relevance: PA-MCMC is positioned relative to Riemannian MCMC; Betancourt can

@@ -111,6 +111,7 @@ def cu_mcmc_burnin_freeze(log_p, x0, n_steps, base_u=0.3, alpha=0.85,
     x = x0.copy().astype(float)
     lp = log_p(x)
     accepted = 0
+    prod_accepted = 0
     T_burn = int(n_steps * burnin_frac)
     max_u = max_u_factor * base_u
 
@@ -124,6 +125,8 @@ def cu_mcmc_burnin_freeze(log_p, x0, n_steps, base_u=0.3, alpha=0.85,
                 step = np.abs(proposal - x)
                 u = alpha * u + (1.0 - alpha) * step
                 u = np.clip(u, min_u, max_u)
+            else:
+                prod_accepted += 1
             # Production: u is frozen — no update
             x, lp = proposal, lp_prop
             accepted += 1
@@ -135,7 +138,9 @@ def cu_mcmc_burnin_freeze(log_p, x0, n_steps, base_u=0.3, alpha=0.85,
 
         chain[i] = x
 
-    return chain, accepted / n_steps
+    prod_steps = n_steps - T_burn
+    prod_rate = prod_accepted / prod_steps if prod_steps > 0 else 0.0
+    return chain, accepted / n_steps, prod_rate
 
 
 def cu_mcmc(log_p, x0, n_steps, base_u=0.3, alpha=0.85,

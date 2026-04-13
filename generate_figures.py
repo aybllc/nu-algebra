@@ -79,8 +79,8 @@ def fig1_rosenbrock():
     rng_s = np.random.default_rng(SEED)
     rng_p = np.random.default_rng(SEED)
     chain_s, acc_s = standard_mh(log_p, x0, N_STEPS, proposal_scale=0.05, rng=rng_s)
-    chain_p, acc_p = cu_mcmc_burnin_freeze(log_p, x0, N_STEPS,
-                                            base_u=0.05, alpha=0.90, rng=rng_p)
+    chain_p, acc_p, acc_p_prod = cu_mcmc_burnin_freeze(log_p, x0, N_STEPS,
+                                                        base_u=0.05, alpha=0.90, rng=rng_p)
 
     ess_s = ess_multivariate(chain_s)
     ess_p = ess_multivariate(chain_p)
@@ -93,9 +93,9 @@ def fig1_rosenbrock():
 
     fig, axes = plt.subplots(1, 2, figsize=(9, 4), sharey=True)
 
-    for ax, chain, acc, ess, label, color, title in [
-        (axes[0], chain_s, acc_s, ess_s, "Standard MH", COL_STD, "Standard MH"),
-        (axes[1], chain_p, acc_p, ess_p, "PA-MCMC",    COL_PA,  "PA-MCMC"),
+    for ax, chain, acc, acc_prod, ess, label, color, title in [
+        (axes[0], chain_s, acc_s, acc_s, ess_s, "Standard MH", COL_STD, "Standard MH"),
+        (axes[1], chain_p, acc_p, acc_p_prod, ess_p, "PA-MCMC",    COL_PA,  "PA-MCMC"),
     ]:
         ax.contourf(X, Y, Z, levels=12, cmap="Blues", alpha=0.35)
         ax.contour(X, Y, Z, levels=12, colors="steelblue", linewidths=0.4, alpha=0.6)
@@ -103,7 +103,7 @@ def fig1_rosenbrock():
         ax.plot(chain[:, 0], chain[:, 1], color=color, alpha=0.15, lw=0.5, zorder=1)
         ax.scatter(chain[::5, 0], chain[::5, 1],
                    c=color, s=1.5, alpha=0.4, zorder=2)
-        ax.set_title(f"{title}\nESS={ess:.0f}  accept={acc:.2f}", pad=6)
+        ax.set_title(f"{title}\nESS={ess:.0f}  accept (prod)={acc_prod:.2f}", pad=6)
         ax.set_xlabel("$x_1$")
         ax.set_xlim(-2.0, 2.5)
         ax.set_ylim(-0.5, 5.5)
@@ -132,7 +132,7 @@ def fig2_ess_scaling():
         rng_s = np.random.default_rng(SEED)
         rng_p = np.random.default_rng(SEED)
         chain_s, _ = standard_mh(log_p, x0, N_STEPS, proposal_scale=ps, rng=rng_s)
-        chain_p, _ = cu_mcmc_burnin_freeze(log_p, x0, N_STEPS,
+        chain_p, _, _prod = cu_mcmc_burnin_freeze(log_p, x0, N_STEPS,
                                             base_u=ps, alpha=0.88, rng=rng_p)
 
         es = ess_multivariate(chain_s)
@@ -197,7 +197,7 @@ def fig3_efficiency_per_eval():
         rng_s = np.random.default_rng(SEED)
         rng_p = np.random.default_rng(SEED)
         chain_s, _ = standard_mh(log_p, x0, N_STEPS, proposal_scale=ps, rng=rng_s)
-        chain_p, _ = cu_mcmc_burnin_freeze(log_p, x0, N_STEPS,
+        chain_p, _, _prod = cu_mcmc_burnin_freeze(log_p, x0, N_STEPS,
                                             base_u=bu, alpha=alpha, rng=rng_p)
 
         n_eval = count_evals(N_STEPS)
@@ -244,8 +244,8 @@ def fig4_multimodal():
     rng_s = np.random.default_rng(SEED)
     rng_p = np.random.default_rng(SEED)
     chain_s, acc_s = standard_mh(log_p, x0, N_STEPS*2, proposal_scale=1.2, rng=rng_s)
-    chain_p, acc_p = cu_mcmc_burnin_freeze(log_p, x0, N_STEPS*2,
-                                            base_u=1.2, alpha=0.97, rng=rng_p)
+    chain_p, acc_p, acc_p_prod = cu_mcmc_burnin_freeze(log_p, x0, N_STEPS*2,
+                                                        base_u=1.2, alpha=0.97, rng=rng_p)
 
     ess_s = ess_multivariate(chain_s)
     ess_p = ess_multivariate(chain_p)
@@ -259,9 +259,9 @@ def fig4_multimodal():
     X, Y = np.meshgrid(xg, yg)
     Z = np.exp(np.vectorize(lambda a, b: log_p(np.array([a, b])))(X, Y))
 
-    for col, (chain, acc, ess, color, title) in enumerate([
+    for col, (chain, acc_prod, ess, color, title) in enumerate([
         (chain_s, acc_s, ess_s, COL_STD, "Standard MH"),
-        (chain_p, acc_p, ess_p, COL_PA,  "PA-MCMC"),
+        (chain_p, acc_p_prod, ess_p, COL_PA,  "PA-MCMC"),
     ]):
         ax = axes[0, col]
         ax.contourf(X, Y, Z, levels=10, cmap="Greys", alpha=0.3)
@@ -269,7 +269,7 @@ def fig4_multimodal():
                    c=color, s=1.5, alpha=0.3)
         for m in true_means:
             ax.axvline(m[0], ls=":", color="gray", lw=0.8, alpha=0.7)
-        ax.set_title(f"{title}\nESS={ess:.0f}  accept={acc:.2f}")
+        ax.set_title(f"{title}\nESS={ess:.0f}  accept (prod)={acc_prod:.2f}")
         ax.set_xlabel("$x_1$")
         ax.set_ylabel("$x_2$")
         ax.set_xlim(-7, 7)
