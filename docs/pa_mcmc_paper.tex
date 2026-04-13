@@ -142,7 +142,7 @@ $x^3$    & $x = 0$ & 3 & $u^3$ \\
 \end{table}
 
 % ─────────────────────────────────────────────────────────────────────────────
-\section{$\lambda$--$k$ Order Selection Theorem}
+\section{Lambda--k Order Selection Theorem}
 \label{sec:orderselection}
 
 Theorem~\ref{thm:propagation} addresses scalar functions.
@@ -264,7 +264,9 @@ PA-MCMC carries a per-dimension \emph{uncertainty payload} $\mathbf{u} \in
 The accept-only update rule is essential: rejected proposals carry no geometric
 information at per-step resolution.
 The burn-in-freeze protocol satisfies the \emph{vanishing adaptation condition}
-of \citet{roberts2009examples}, ensuring ergodicity of the full chain.
+of \citet{roberts2009examples}: because adaptation ceases entirely after the
+burn-in phase, the production kernel is fixed and detailed balance holds exactly,
+ensuring ergodicity of the full chain.
 The memory timescale $\tau = 1/(1-\alpha_{\mathrm{EMA}})$ must satisfy
 $\tau \ge d$ (number of parameters) for the payload to map the full posterior
 geometry before convergence.
@@ -304,9 +306,12 @@ Gaussian Mixture (bimodal)           & 330.9 & 768.6 & $ 2.3\times$ & $> 0$ (mod
 \end{tabular}
 \end{table}
 
-ESS gain scales with the \emph{degeneracy fraction} $d_{\mathrm{degen}}/d$: as $d$
-increases with fixed degenerate subspace dimension, gains decrease
-(56$\times$ at 2D, 28$\times$ at 10D).
+We define the \emph{degeneracy fraction} as $d_{\mathrm{degen}}/d$, where
+$d_{\mathrm{degen}}$ is the number of dimensions with near-zero curvature
+(eigenvalue of the Hessian of $-\log\pi$ below a threshold of 0.1) and $d$
+is the total dimension.
+ESS gain scales with this fraction: as $d$ increases with fixed degenerate
+subspace dimension, gains decrease (56$\times$ at 2D, 28$\times$ at 10D).
 For the bimodal target, PA-MCMC improves ESS within each mode but cannot bridge
 mode gaps at high persistence; this defines the operational boundary of the method.
 
@@ -381,8 +386,9 @@ $\Lambda$CDM ($w_0 = -1$).
 Credible interval widths agree between PA-MCMC and standard MH to within 4--8\%.
 
 \paragraph{Interpretation.}
-The DESI posterior with Planck priors has condition number ${\sim}5$
-(mild, not severely degenerate).
+The DESI posterior with Planck priors has condition number $\kappa \approx 5$,
+where $\kappa$ is the ratio of the largest to smallest eigenvalue of the
+posterior covariance — a mild value indicating well-conditioned geometry.
 The Planck priors break the main $H_0$--$r_d$ and $H_0$--$\Omega_m$ degeneracies,
 leaving only a mild $w_0$--$w_a$ anti-correlation.
 PA-MCMC provides no measurable ESS gain in this setting; the DESI ${\sim}2.5\sigma$
