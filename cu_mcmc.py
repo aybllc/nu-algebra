@@ -88,6 +88,56 @@ def standard_mh(log_p, x0, n_steps, proposal_scale=0.3, rng=None):
     return chain, accepted / n_steps
 
 
+def cu_mcmc_burnin_freeze(log_p, x0, n_steps, base_u=0.3, alpha=0.85,
+                          burnin_frac=0.2, min_u=1e-6, max_u_factor=4.0, rng=None):
+    """
+    PA-MCMC: Payload-Augmented MCMC — Burn-in-then-Freeze Protocol.
+
+    Phase 1 (burn-in, first burnin_frac of steps): adapt payload continuously.
+    Phase 2 (production, remaining steps): payload frozen → exactly valid M-H.
+
+    This satisfies the VANISHING ADAPTATION condition for ergodicity:
+      After T_burn steps, the adaptation terminates completely (α_t → 0 for t > T_burn).
+    The production chain has a FIXED proposal distribution → standard detailed balance.
+
+    This is the publishable version of CU-MCMC.
+    """
+    if rng is None:
+        rng = np.random.default_rng(42)
+
+    dim = len(x0)
+    chain = np.zeros((n_steps, dim))
+    u = np.full(dim, base_u)
+    x = x0.copy().astype(float)
+    lp = log_p(x)
+    accepted = 0
+    T_burn = int(n_steps * burnin_frac)
+    max_u = max_u_factor * base_u
+
+    for i in range(n_steps):
+        proposal = x + rng.normal(0, u)
+        lp_prop = log_p(proposal)
+
+        if np.log(rng.uniform() + 1e-300) < lp_prop - lp:
+            if i < T_burn:
+                # Burn-in: update payload from accepted step
+                step = np.abs(proposal - x)
+                u = alpha * u + (1.0 - alpha) * step
+                u = np.clip(u, min_u, max_u)
+            # Production: u is frozen — no update
+            x, lp = proposal, lp_prop
+            accepted += 1
+        else:
+            if i < T_burn:
+                u = alpha * u
+                u = np.clip(u, min_u, max_u)
+            # Production: u frozen on rejection too
+
+        chain[i] = x
+
+    return chain, accepted / n_steps
+
+
 def cu_mcmc(log_p, x0, n_steps, base_u=0.3, alpha=0.85,
              min_u=1e-6, max_u_factor=4.0, use_mhg_correction=False, rng=None):
     """
@@ -220,13 +270,17 @@ def make_gaussian_mixture(dim=2, n_components=3, sep=3.0):
 # ─── Comparison runner ────────────────────────────────────────────────────────
 
 def compare(log_p, x0, n_steps, label, ps=0.3, bu=0.3, alpha=0.85, seed=42,
-            use_mhg=False):
+            use_mhg=False, use_freeze=True):
     rng_s = np.random.default_rng(seed)
     rng_c = np.random.default_rng(seed)
 
     chain_s, acc_s = standard_mh(log_p, x0, n_steps, proposal_scale=ps, rng=rng_s)
-    chain_c, acc_c = cu_mcmc(log_p, x0, n_steps, base_u=bu, alpha=alpha,
-                              use_mhg_correction=use_mhg, rng=rng_c)
+    if use_freeze:
+        chain_c, acc_c = cu_mcmc_burnin_freeze(log_p, x0, n_steps, base_u=bu,
+                                                alpha=alpha, rng=rng_c)
+    else:
+        chain_c, acc_c = cu_mcmc(log_p, x0, n_steps, base_u=bu, alpha=alpha,
+                                  use_mhg_correction=use_mhg, rng=rng_c)
 
     ess_s = ess_multivariate(chain_s)
     ess_c = ess_multivariate(chain_c)
