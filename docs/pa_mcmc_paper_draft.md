@@ -181,7 +181,7 @@ Then:
 
 The tuning gap is defined as (ESS_optimal − ESS_naive). ES-Gibbs performance is reported as fraction of gap closed.
 
-**Table 3: ES-Gibbs benchmark results.**
+**Table 3: ES-Gibbs benchmark results (seed=99, N=10,000, commit cd00bb1).**
 
 | Target | True scales | Naive ESS | ES-Gibbs ESS | Optimal ESS | Gap closed |
 |--------|------------|-----------|--------------|-------------|------------|

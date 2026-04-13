@@ -1,0 +1,84 @@
+\begin{thebibliography}{8}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Chevallier and Polarski(2001)]{chevallier2001accelerating}
+M.~Chevallier and D.~Polarski.
+\newblock Accelerating universes with scaling dark matter.
+\newblock \emph{International Journal of Modern Physics D}, 10\penalty0
+  (2):\penalty0 213--223, 2001.
+\newblock \doi{10.1142/S0218271801000822}.
+\newblock Introduces the CPL parameterization $w(z) = w_0 + w_a z/(1+z)$ used
+  in the DESI $w_0 w_a$CDM analysis.
+
+\bibitem[{DESI Collaboration} et~al.(2025){DESI Collaboration}, Adame,
+  et~al.]{desi2024bao}
+{DESI Collaboration}, A.~G. Adame, et~al.
+\newblock {DESI} 2024 {VI}: Cosmological constraints from the measurements of
+  baryon acoustic oscillations.
+\newblock \emph{Journal of Cosmology and Astroparticle Physics}, 2025\penalty0
+  (02):\penalty0 021, 2025.
+\newblock \doi{10.1088/1475-7516/2025/02/021}.
+\newblock DESI Year 1 BAO measurements at 7 effective redshifts. The $w_0
+  w_a$CDM analysis yields $\sim$2.5$\sigma$ preference for dynamical dark
+  energy. PA-MCMC is applied to this posterior to test whether standard MH
+  undersamples the $w_0$--$w_a$ degeneracy axis.
+
+\bibitem[Geyer(1992)]{geyer1992practical}
+C.~J. Geyer.
+\newblock Practical {Markov} chain {Monte Carlo}.
+\newblock \emph{Statistical Science}, 7\penalty0 (4):\penalty0 473--483, 1992.
+\newblock \doi{10.1214/ss/1177011137}.
+\newblock Introduces the truncated autocorrelation estimator for ESS used
+  throughout this paper: $\text{ESS} = n / (1 + 2\sum_{k=1}^{K} \rho_k)$.
+
+\bibitem[Girolami and Calderhead(2011)]{girolami2011riemann}
+M.~Girolami and B.~Calderhead.
+\newblock Riemann manifold {Langevin} and {Hamiltonian Monte Carlo} methods.
+\newblock \emph{Journal of the Royal Statistical Society: Series B (Statistical
+  Methodology)}, 73\penalty0 (2):\penalty0 123--214, 2011.
+\newblock \doi{10.1111/j.1467-9868.2010.00765.x}.
+\newblock Riemannian MCMC uses the Fisher information metric to warp proposal
+  geometry. PA-MCMC achieves similar geometric alignment without gradient
+  evaluations by learning from accepted step history.
+
+\bibitem[Linder(2003)]{linder2003exploring}
+E.~V. Linder.
+\newblock Exploring the expansion history of the universe.
+\newblock \emph{Physical Review Letters}, 90\penalty0 (9):\penalty0 091301,
+  2003.
+\newblock \doi{10.1103/PhysRevLett.90.091301}.
+\newblock Independent derivation of the CPL parameterization; with Chevallier
+  (2001), the standard reference for $w_0 w_a$CDM models.
+
+\bibitem[Martin(2025)]{martin2025nasa}
+E.~D. Martin.
+\newblock The {NASA} paper and small falcon algebra, 2025.
+\newblock URL \url{https://doi.org/10.5281/zenodo.17172694}.
+\newblock Introduces the N/U (Nominal/Uncertainty) Algebra, core operations
+  (addition, multiplication, Flip/Catch), invariants, and applications. ORCID:
+  0009-0006-5944-1742.
+
+\bibitem[{Planck Collaboration} et~al.(2020){Planck Collaboration}, Aghanim,
+  et~al.]{planck2020parameters}
+{Planck Collaboration}, N.~Aghanim, et~al.
+\newblock {Planck} 2018 results. {VI}. cosmological parameters.
+\newblock \emph{Astronomy \& Astrophysics}, 641:\penalty0 A6, 2020.
+\newblock \doi{10.1051/0004-6361/201833910}.
+\newblock Planck 2018 best-fit parameters used as priors in the DESI
+  re-analysis: $H_0 = 67.36 \pm 0.54$, $\Omega_m = 0.3153 \pm 0.0073$, $r_d =
+  147.18 \pm 0.29$ Mpc.
+
+\bibitem[Roberts and Rosenthal(2009)]{roberts2009examples}
+G.~O. Roberts and J.~S. Rosenthal.
+\newblock Examples of adaptive {MCMC}.
+\newblock \emph{Journal of Computational and Graphical Statistics}, 18\penalty0
+  (2):\penalty0 349--367, 2009.
+\newblock \doi{10.1198/jcgs.2009.06134}.
+\newblock Establishes vanishing adaptation as the key condition for ergodicity
+  of adaptive MCMC. PA-MCMC satisfies this via the burn-in-freeze protocol.
+
+\end{thebibliography}
