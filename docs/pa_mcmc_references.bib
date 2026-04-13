@@ -1,0 +1,182 @@
+% PA-MCMC Paper — Core References
+% Eric D. Martin, 2026
+%
+% Covers: Adaptive MCMC foundations, optimal scaling theory, DESI BAO data,
+%         and the Propagation Order Theorem context.
+
+% ─── Adaptive MCMC Foundations ───────────────────────────────────────────────
+
+@article{haario2001adaptive,
+  title     = {An adaptive Metropolis algorithm},
+  author    = {Haario, Heikki and Saksman, Eero and Tamminen, Johanna},
+  journal   = {Bernoulli},
+  volume    = {7},
+  number    = {2},
+  pages     = {223--242},
+  year      = {2001},
+  publisher = {Bernoulli Society for Mathematical Statistics and Probability},
+  doi       = {10.2307/3318737},
+  note      = {Introduces Adaptive Metropolis (AM). The burn-in-freeze protocol
+               in PA-MCMC satisfies the same vanishing adaptation condition
+               required for ergodicity in AM.}
+}
+
+@article{roberts2009examples,
+  title     = {Examples of adaptive {MCMC}},
+  author    = {Roberts, Gareth O. and Rosenthal, Jeffrey S.},
+  journal   = {Journal of Computational and Graphical Statistics},
+  volume    = {18},
+  number    = {2},
+  pages     = {349--367},
+  year      = {2009},
+  publisher = {Taylor \& Francis},
+  doi       = {10.1198/jcgs.2009.06134},
+  note      = {Establishes vanishing adaptation as the key condition for
+               ergodicity of adaptive MCMC. PA-MCMC satisfies this via the
+               burn-in-freeze protocol.}
+}
+
+% ─── Optimal Scaling Theory ───────────────────────────────────────────────────
+
+@article{roberts1997weak,
+  title     = {Weak convergence and optimal scaling of random walk {Metropolis} algorithms},
+  author    = {Roberts, Gareth O. and Gelman, Andrew and Gilks, Walter R.},
+  journal   = {The Annals of Applied Probability},
+  volume    = {7},
+  number    = {1},
+  pages     = {110--120},
+  year      = {1997},
+  publisher = {Institute of Mathematical Statistics},
+  doi       = {10.1214/aoap/1034625254},
+  note      = {Shows optimal acceptance rate is 0.234 for high-dimensional
+               isotropic RWM; motivates the per-dimension adaptation in PA-MCMC.}
+}
+
+@book{gelman2013bayesian,
+  title     = {Bayesian Data Analysis},
+  author    = {Gelman, Andrew and Carlin, John B. and Stern, Hal S. and
+               Dunson, David B. and Vehtari, Aki and Rubin, Donald B.},
+  edition   = {3rd},
+  year      = {2013},
+  publisher = {CRC Press},
+  address   = {Boca Raton, FL},
+  isbn      = {978-1-4398-4095-5},
+  note      = {Standard Bayesian reference; Chapter 11 covers Metropolis-Hastings
+               proposal tuning and convergence diagnostics including ESS.}
+}
+
+% ─── Riemannian / Geometry-Aware MCMC ────────────────────────────────────────
+
+@article{girolami2011riemann,
+  title     = {Riemann manifold {Langevin} and {Hamiltonian Monte Carlo} methods},
+  author    = {Girolami, Mark and Calderhead, Ben},
+  journal   = {Journal of the Royal Statistical Society: Series B
+               (Statistical Methodology)},
+  volume    = {73},
+  number    = {2},
+  pages     = {123--214},
+  year      = {2011},
+  publisher = {Wiley},
+  doi       = {10.1111/j.1467-9868.2010.00765.x},
+  note      = {Riemannian MCMC uses the Fisher information metric to warp
+               proposal geometry. PA-MCMC achieves similar geometric alignment
+               without gradient evaluations by learning from accepted step history.}
+}
+
+% ─── Effective Sample Size ────────────────────────────────────────────────────
+
+@article{geyer1992practical,
+  title     = {Practical {Markov} chain {Monte Carlo}},
+  author    = {Geyer, Charles J.},
+  journal   = {Statistical Science},
+  volume    = {7},
+  number    = {4},
+  pages     = {473--483},
+  year      = {1992},
+  publisher = {Institute of Mathematical Statistics},
+  doi       = {10.1214/ss/1177011137},
+  note      = {Introduces the truncated autocorrelation estimator for ESS used
+               throughout this paper: ESS = n / (1 + 2\sum_{k=1}^{K} \rho_k).}
+}
+
+% ─── DESI BAO Data ────────────────────────────────────────────────────────────
+
+@article{desi2024bao,
+  title     = {{DESI} 2024 {VI}: Cosmological constraints from the measurements
+               of baryon acoustic oscillations},
+  author    = {{DESI Collaboration} and Adame, A. G. and others},
+  journal   = {Journal of Cosmology and Astroparticle Physics},
+  year      = {2025},
+  volume    = {2025},
+  number    = {02},
+  pages     = {021},
+  doi       = {10.1088/1475-7516/2025/02/021},
+  eprint    = {2404.03002},
+  archivePrefix = {arXiv},
+  note      = {DESI Year 1 BAO measurements at 7 effective redshifts. The
+               $w_0 w_a$CDM analysis yields $\sim$2.5$\sigma$ preference for
+               dynamical dark energy. PA-MCMC is applied to this posterior to
+               test whether standard MH undersamples the $w_0$--$w_a$ degeneracy axis.}
+}
+
+% ─── Cosmological Model ───────────────────────────────────────────────────────
+
+@article{chevallier2001accelerating,
+  title     = {Accelerating universes with scaling dark matter},
+  author    = {Chevallier, Michel and Polarski, David},
+  journal   = {International Journal of Modern Physics D},
+  volume    = {10},
+  number    = {2},
+  pages     = {213--223},
+  year      = {2001},
+  publisher = {World Scientific},
+  doi       = {10.1142/S0218271801000822},
+  note      = {Introduces the CPL parameterization $w(z) = w_0 + w_a z/(1+z)$
+               used in the DESI $w_0 w_a$CDM analysis.}
+}
+
+@article{linder2003exploring,
+  title     = {Exploring the expansion history of the universe},
+  author    = {Linder, Eric V.},
+  journal   = {Physical Review Letters},
+  volume    = {90},
+  number    = {9},
+  pages     = {091301},
+  year      = {2003},
+  publisher = {American Physical Society},
+  doi       = {10.1103/PhysRevLett.90.091301},
+  note      = {Independent derivation of the CPL parameterization; with Chevallier
+               (2001), the standard reference for $w_0 w_a$CDM models.}
+}
+
+@article{planck2020parameters,
+  title     = {{Planck} 2018 results. {VI}. Cosmological parameters},
+  author    = {{Planck Collaboration} and Aghanim, N. and others},
+  journal   = {Astronomy \& Astrophysics},
+  volume    = {641},
+  pages     = {A6},
+  year      = {2020},
+  doi       = {10.1051/0004-6361/201833910},
+  eprint    = {1807.06209},
+  archivePrefix = {arXiv},
+  note      = {Planck 2018 best-fit parameters used as priors in the DESI
+               re-analysis: $H_0 = 67.36 \pm 0.54$, $\Omega_m = 0.3153 \pm 0.0073$,
+               $r_d = 147.18 \pm 0.29$ Mpc.}
+}
+
+% ─── Rosenbrock Benchmark ─────────────────────────────────────────────────────
+
+@article{rosenbrock1960automatic,
+  title     = {An automatic method for finding the greatest or least value of a function},
+  author    = {Rosenbrock, H. H.},
+  journal   = {The Computer Journal},
+  volume    = {3},
+  number    = {3},
+  pages     = {175--184},
+  year      = {1960},
+  publisher = {Oxford University Press},
+  doi       = {10.1093/comjnl/3.3.175},
+  note      = {The Rosenbrock (banana) function, used as a canonical benchmark
+               for degenerate sampling. The curved valley geometry (curvature
+               constant $b=100$) mimics the $w_0$--$w_a$ dark energy degeneracy.}
+}
