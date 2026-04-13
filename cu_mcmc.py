@@ -88,26 +88,33 @@ def standard_mh(log_p, x0, n_steps, proposal_scale=0.3, rng=None):
     return chain, accepted / n_steps
 
 
-def cu_mcmc_burnin_freeze(log_p, x0, n_steps, base_u=0.3, alpha=0.85,
-                          burnin_frac=0.2, min_u=1e-6, max_u_factor=4.0, rng=None):
+def cu_mcmc_burnin_freeze(log_p, x0, n_steps, base_u=0.3, alpha=0.97,
+                          burnin_frac=0.25, min_u=None, max_u_factor=5.0, rng=None):
     """
     PA-MCMC: Payload-Augmented MCMC — Burn-in-then-Freeze Protocol.
 
-    Phase 1 (burn-in, first burnin_frac of steps): adapt payload continuously.
-    Phase 2 (production, remaining steps): payload frozen → exactly valid M-H.
+    Phase 1 (burn-in, first burnin_frac of steps): adapt payload ONLY on accepted steps.
+    Phase 2 (production, remaining steps): payload frozen → exact detailed balance.
 
-    This satisfies the VANISHING ADAPTATION condition for ergodicity:
-      After T_burn steps, the adaptation terminates completely (α_t → 0 for t > T_burn).
-    The production chain has a FIXED proposal distribution → standard detailed balance.
+    Vanishing adaptation condition (Roberts & Rosenthal 2009): adaptation ceases
+    entirely after T_burn steps; the production kernel is fixed and ergodic.
 
-    This is the publishable version of CU-MCMC.
+    Key parameters:
+      alpha=0.97  → memory timescale τ = 1/(1-α) = 33 steps (must satisfy τ ≥ d)
+      min_u       → floor at 0.30 × base_u prevents EMA underestimation bias
+                    when burn-in acceptance is low (<23%)
+
+    Bug note: do NOT update u on rejection. Rejection-branch shrinkage creates
+    a death spiral (smaller u → higher accept → EMA learns tiny steps → freeze).
     """
     if rng is None:
         rng = np.random.default_rng(42)
+    if min_u is None:
+        min_u = 0.30 * base_u  # floor: 30% of calibrated estimate
 
     dim = len(x0)
     chain = np.zeros((n_steps, dim))
-    u = np.full(dim, base_u)
+    u = np.full(dim, float(base_u))
     x = x0.copy().astype(float)
     lp = log_p(x)
     accepted = 0
@@ -121,26 +128,141 @@ def cu_mcmc_burnin_freeze(log_p, x0, n_steps, base_u=0.3, alpha=0.85,
 
         if np.log(rng.uniform() + 1e-300) < lp_prop - lp:
             if i < T_burn:
-                # Burn-in: update payload from accepted step
+                # Burn-in: EMA toward accepted step geometry (accept-only)
                 step = np.abs(proposal - x)
-                u = alpha * u + (1.0 - alpha) * step
-                u = np.clip(u, min_u, max_u)
+                u = np.clip(alpha * u + (1.0 - alpha) * step, min_u, max_u)
             else:
                 prod_accepted += 1
-            # Production: u is frozen — no update
             x, lp = proposal, lp_prop
             accepted += 1
-        else:
-            if i < T_burn:
-                u = alpha * u
-                u = np.clip(u, min_u, max_u)
-            # Production: u frozen on rejection too
+        # On rejection: payload unchanged — accept-only EMA rule
 
         chain[i] = x
 
     prod_steps = n_steps - T_burn
     prod_rate = prod_accepted / prod_steps if prod_steps > 0 else 0.0
     return chain, accepted / n_steps, prod_rate
+
+
+def cu_mcmc_gibbs(log_p, x0, n_steps, base_u=0.3, alpha=0.97,
+                  burnin_frac=0.25, min_u=None, max_u_factor=5.0, rng=None):
+    """
+    Gibbs-style PA-MCMC: Metropolis-within-Gibbs with per-dimension payload.
+
+    Fixes the Joint Rejection Bottleneck in cu_mcmc_burnin_freeze:
+      - Joint proposal: ONE accept/reject gate for ALL dims simultaneously.
+        The stiffest dim dominates rejection rate → flat dims starved of updates.
+      - Gibbs proposal: each dim gets its OWN M-H step and OWN u adaptation.
+        Stiff dim (small u, high reject) and flat dim (large u, low reject)
+        evolve on independent timescales → payload separates correctly.
+
+    This is the necessary topological condition for implementing the
+    Propagation Order Theorem across varying curvature scales (§11).
+
+    Phase 1 (burn-in): per-dim M-H, per-dim EMA update on acceptance.
+    Phase 2 (production): per-dim M-H with FROZEN u (exact detailed balance).
+    """
+    if rng is None:
+        rng = np.random.default_rng(42)
+    if min_u is None:
+        min_u = 0.30 * base_u
+
+    dim = len(x0)
+    chain = np.zeros((n_steps, dim))
+    u = np.full(dim, float(base_u))
+    x = x0.copy().astype(float)
+    lp = log_p(x)
+    accepted = np.zeros(dim, dtype=float)
+    T_burn = int(n_steps * burnin_frac)
+    max_u = max_u_factor * base_u
+
+    for i in range(n_steps):
+        for d in range(dim):
+            x_prop = x.copy()
+            x_prop[d] += rng.normal(0, u[d])
+            lp_prop = log_p(x_prop)
+
+            if np.log(rng.uniform() + 1e-300) < lp_prop - lp:
+                if i < T_burn:
+                    step = abs(x_prop[d] - x[d])
+                    u[d] = np.clip(alpha * u[d] + (1.0 - alpha) * step, min_u, max_u)
+                x[d] = x_prop[d]
+                lp = lp_prop
+                accepted[d] += 1
+
+        chain[i] = x
+
+    return chain, accepted / n_steps, u   # return final u for diagnostics
+
+
+def cu_mcmc_gibbs_rm(log_p, x0, n_steps, base_u=1.0,
+                     burnin_frac=0.25, target_rate=0.44, step_size=0.5,
+                     u_min=1e-4, u_max_factor=20.0, rng=None):
+    """
+    Gibbs-style PA-MCMC with Robbins-Monro acceptance-rate targeting.
+
+    DESIGN:
+    Each dimension gets its own Metropolis step (Metropolis-within-Gibbs).
+    Each dimension's proposal scale u[d] is adapted independently via
+    log-scale stochastic approximation (Robbins-Monro):
+
+      On acceptance:  log u[d] += step_size * (1 − target_rate)
+      On rejection:   log u[d] -= step_size * target_rate
+
+    Equivalently: u[d] *= exp(step_size * (accept − target_rate))
+
+    EQUILIBRIUM: E[Δ log u[d]] = 0  ⟺  accept_rate[d] = target_rate
+    For Gaussian targets: u[d]_equilibrium ≈ 2.38 × true_std[d]  (optimal 1D MH scale)
+
+    TARGET RATE: 0.44 — optimal for 1D Metropolis (Roberts, Gelman & Gilks 1997).
+    (Not 0.234: that is the optimal rate for joint/isotropic proposals in high-d.)
+
+    STEP_SIZE: constant 0.5 during burn-in.  After T_burn, u is FROZEN.
+    The hard freeze satisfies the vanishing adaptation condition
+    (Roberts & Rosenthal 2009): no correction term needed in acceptance ratio.
+
+    CLAIM (falsifiable):
+    Starting from a single base_u (same for all dims, poorly tuned),
+    PA-MCMC Gibbs recovers per-dimension optimal scales — without knowing the
+    posterior in advance — and approaches the performance of an oracle-tuned
+    fixed Gibbs sampler. This is the Tuning Gap the algorithm closes.
+    """
+    if rng is None:
+        rng = np.random.default_rng(42)
+
+    dim = len(x0)
+    chain = np.zeros((n_steps, dim))
+    log_u = np.full(dim, np.log(float(base_u)))   # work in log-scale
+    x = x0.copy().astype(float)
+    lp = log_p(x)
+    accepted = np.zeros(dim, dtype=float)
+    T_burn = int(n_steps * burnin_frac)
+    log_u_min = np.log(u_min)
+    log_u_max = np.log(u_max_factor * base_u)
+
+    for i in range(n_steps):
+        for d in range(dim):
+            u_d = np.exp(log_u[d])
+            x_prop = x.copy()
+            x_prop[d] += rng.normal(0, u_d)
+            lp_prop = log_p(x_prop)
+
+            accept = np.log(rng.uniform() + 1e-300) < lp_prop - lp
+            if accept:
+                x[d] = x_prop[d]
+                lp = lp_prop
+                accepted[d] += 1
+
+            if i < T_burn:
+                # R-M log-scale update: target accept_rate → target_rate
+                delta = step_size * (float(accept) - target_rate)
+                log_u[d] = np.clip(log_u[d] + delta, log_u_min, log_u_max)
+            # After T_burn: log_u frozen — exact detailed balance in production
+
+        chain[i] = x
+
+    u_final = np.exp(log_u)
+    return chain, accepted / n_steps, u_final
 
 
 def cu_mcmc(log_p, x0, n_steps, base_u=0.3, alpha=0.85,
@@ -272,7 +394,37 @@ def make_gaussian_mixture(dim=2, n_components=3, sep=3.0):
     return log_p, means
 
 
-# ─── Comparison runner ────────────────────────────────────────────────────────
+# ─── Fixed-proposal Gibbs (baseline / oracle) ─────────────────────────────────
+
+def standard_gibbs(log_p, x0, n_steps, u_per_dim, rng=None):
+    """
+    Fixed-proposal Metropolis-within-Gibbs — no adaptation.
+
+    Used as both:
+      - Naive baseline: u_per_dim = [base_u, …] (same for all dims, poorly tuned)
+      - Oracle ceiling: u_per_dim = 2.38 × true_std[d]  (optimal per Gaussian theory)
+    """
+    if rng is None:
+        rng = np.random.default_rng(42)
+    dim = len(x0)
+    chain = np.zeros((n_steps, dim))
+    x = x0.copy().astype(float)
+    lp = log_p(x)
+    accepted = np.zeros(dim, dtype=float)
+    for i in range(n_steps):
+        for d in range(dim):
+            x_prop = x.copy()
+            x_prop[d] += rng.normal(0, u_per_dim[d])
+            lp_prop = log_p(x_prop)
+            if np.log(rng.uniform() + 1e-300) < lp_prop - lp:
+                x[d] = x_prop[d]
+                lp = lp_prop
+                accepted[d] += 1
+        chain[i] = x
+    return chain, accepted / n_steps
+
+
+# ─── Comparison runner (legacy — original EMA joint-proposal benchmark) ───────
 
 def compare(log_p, x0, n_steps, label, ps=0.3, bu=0.3, alpha=0.85, seed=42,
             use_mhg=False, use_freeze=True):
@@ -281,8 +433,8 @@ def compare(log_p, x0, n_steps, label, ps=0.3, bu=0.3, alpha=0.85, seed=42,
 
     chain_s, acc_s = standard_mh(log_p, x0, n_steps, proposal_scale=ps, rng=rng_s)
     if use_freeze:
-        chain_c, acc_c = cu_mcmc_burnin_freeze(log_p, x0, n_steps, base_u=bu,
-                                                alpha=alpha, rng=rng_c)
+        chain_c, acc_c, _prod_c = cu_mcmc_burnin_freeze(log_p, x0, n_steps, base_u=bu,
+                                                         alpha=alpha, rng=rng_c)
     else:
         chain_c, acc_c = cu_mcmc(log_p, x0, n_steps, base_u=bu, alpha=alpha,
                                   use_mhg_correction=use_mhg, rng=rng_c)
@@ -360,117 +512,142 @@ def detailed_balance_notes():
     """
 
 
-# ─── Main ─────────────────────────────────────────────────────────────────────
+# ─── Main — 3-way honest benchmark ───────────────────────────────────────────
 
 def main():
-    N = 5000  # steps
+    """
+    3-way benchmark establishing the PA-MCMC Gibbs claim.
+
+    CLAIM: Starting from a single base_u (same for all dimensions, poorly tuned),
+    PA-MCMC Gibbs discovers per-dimension optimal proposal scales automatically
+    and closes the tuning gap versus an oracle-tuned fixed Gibbs sampler.
+
+    SCOPE: Posteriors with approximately unimodal per-dimension conditionals.
+    The 0.44 target rate is derived from Gaussian theory; it is not universal.
+
+    THREE COMPETITORS:
+      [1] Naive Gibbs — fixed u = base_u for all dims (same start as PA-MCMC)
+      [2] PA-MCMC Gibbs (R-M) — starts at base_u, adapts per-dim during burn-in
+      [3] Oracle Gibbs — fixed u = 2.38 × true_std[d] (optimal, requires knowing π)
+    """
     SEED = 99
+    N    = 10_000
+    BURN = N // 4
+    BASE = 1.0        # same bad init for both [1] and [2]
+    W    = 66
 
-    print("=" * 72)
-    print("CU-MCMC — Carried Uncertainty MCMC  (Eric D. Martin, 2026-04-12)")
-    print("Propagation Order Theorem → accepted-step EMA as structural payload")
-    print("=" * 72)
+    def _fmt_acc(a):
+        a = np.atleast_1d(a)
+        if len(a) == 1:
+            return f"{a[0]:.3f}"
+        return f"[{a[0]:.3f}…{a[-1]:.3f}]"
 
-    all_r = []
+    def _run(log_p, x0, u_oracle, true_std=None):
+        c1, a1 = standard_gibbs(log_p, x0, N, np.full(len(x0), BASE),
+                                 np.random.default_rng(SEED))
+        c2, a2, ul = cu_mcmc_gibbs_rm(log_p, x0, N, base_u=BASE, step_size=0.5,
+                                       rng=np.random.default_rng(SEED))
+        c3, a3 = standard_gibbs(log_p, x0, N, u_oracle,
+                                 np.random.default_rng(SEED))
+        e1 = ess_multivariate(c1[BURN:])
+        e2 = ess_multivariate(c2[BURN:])
+        e3 = ess_multivariate(c3[BURN:])
+        return dict(e1=e1, e2=e2, e3=e3, a1=a1, a2=a2, a3=a3,
+                    ul=ul, uo=u_oracle, true_std=true_std,
+                    post_std=c2[BURN:].std(0) if true_std is not None else None)
 
-    # ── Case A1: Elongated Gaussian (condition 100, 45° rotated) ──────────────
-    print("\n── Case A1: Elongated Gaussian 2D (cond=100, ≈H₀–Ωm valley) ──")
-    log_p, tm, ts, cov = make_elongated_gaussian(dim=2, condition_number=100)
-    x0 = np.array([0.5, -0.3])
-    # Standard MH: optimal scale for isotropic ≈ 2.38/sqrt(d) * sqrt(trace(Cov)/d)
-    # but cov is ill-conditioned, so single-scale MH struggles
-    ps = 0.08
-    r = compare(log_p, x0, N, "ElongGauss-2D", ps=ps, bu=ps, alpha=0.88, seed=SEED)
-    all_r.append(r)
-    print(f"  Standard MH:  ESS={r['ess_s']:6.1f}, accept={r['acc_s']:.2f}")
-    print(f"  CU-MCMC:      ESS={r['ess_c']:6.1f}, accept={r['acc_c']:.2f}")
-    print(f"  ESS ratio:    {r['ratio']:.2f}x  |  mean_diff={r['mean_diff']:.4f}"
-          f"  posterior_ok={r['posterior_ok']}")
-    print(f"  [True aspect ratio: {ts[0]/ts[1]:.1f}:{1} — valley width ratio {1/ts[1]:.2f}:{1/ts[0]:.2f}]")
+    def _print(r, label, note=None):
+        e1, e2, e3 = r['e1'], r['e2'], r['e3']
+        vs   = e2 / max(e1, 1.0)
+        gap  = e2 / max(e3, 1.0)
+        ok   = "✅" if vs >= 1.5 and gap >= 0.80 else ("⚠ " if vs >= 1.0 else "❌")
+        ul   = r['ul'];  uo = r['uo']
+        ul_s = f"[{ul[0]:.3f}…{ul[-1]:.3f}]" if len(ul) > 2 else f"[{ul[0]:.3f}, {ul[-1]:.3f}]"
+        uo_s = f"[{uo[0]:.3f}…{uo[-1]:.3f}]" if len(uo) > 2 else f"[{uo[0]:.3f}, {uo[-1]:.3f}]"
+        print(f"  [1] Naive Gibbs   ESS={e1:7.1f}  acc={_fmt_acc(r['a1'])}  u=[{BASE:.1f}…]")
+        print(f"  [2] PA-MCMC Gibbs ESS={e2:7.1f}  acc={_fmt_acc(r['a2'])}  u_learned={ul_s}")
+        print(f"  [3] Oracle Gibbs  ESS={e3:7.1f}  acc={_fmt_acc(r['a3'])}  u_oracle={uo_s}")
+        print(f"  {ok} {vs:.2f}× over naive  |  {gap:.2f}× vs oracle  "
+              f"(tuning gap closed: {min(gap,1.0)*100:.0f}%)")
+        if r['true_std'] is not None and r['post_std'] is not None:
+            err = np.abs(r['post_std'] - r['true_std'])
+            print(f"     Posterior std error: max={err.max():.4f}  "
+                  f"(PA-MCMC true={np.round(r['true_std'],3)}, got={np.round(r['post_std'],3)})")
+        if note:
+            print(f"     {note}")
 
-    # ── Case A2: Rosenbrock 2D ────────────────────────────────────────────────
-    print("\n── Case A2: Rosenbrock 2D (banana, b=100) ──")
-    log_p = make_rosenbrock(dim=2)
-    x0 = np.array([0.0, 0.5])
-    r = compare(log_p, x0, N, "Rosenbrock-2D", ps=0.05, bu=0.05, alpha=0.90, seed=SEED)
-    all_r.append(r)
-    print(f"  Standard MH:  ESS={r['ess_s']:6.1f}, accept={r['acc_s']:.2f}")
-    print(f"  CU-MCMC:      ESS={r['ess_c']:6.1f}, accept={r['acc_c']:.2f}")
-    print(f"  ESS ratio:    {r['ratio']:.2f}x  |  mean_diff={r['mean_diff']:.4f}"
-          f"  posterior_ok={r['posterior_ok']}")
+    all_results = []
 
-    # ── Case B: Dimensionality scaling ────────────────────────────────────────
-    print("\n── Case B: Scaling 2D / 5D / 10D (Elongated Gaussian, cond=100) ──")
-    scale_r = []
-    for dim in [2, 5, 10]:
-        log_p, tm, ts, cov = make_elongated_gaussian(dim=dim, condition_number=100)
-        x0 = np.zeros(dim)
-        ps = 0.08 / np.sqrt(dim)
-        r = compare(log_p, x0, N, f"ElongGauss-{dim}D",
-                    ps=ps, bu=ps, alpha=0.88, seed=SEED)
-        all_r.append(r)
-        scale_r.append(r)
-        print(f"  {dim:2d}D  |  ESS_std={r['ess_s']:6.1f}  ESS_cu={r['ess_c']:6.1f}"
-              f"  ratio={r['ratio']:.2f}x  mean_diff={r['mean_diff']:.4f}")
-
-    # ── Case C: Gaussian Mixture with MH-Green correction ────────────────────
-    print("\n── Case C: Gaussian Mixture 2D (3 modes, sep=3σ) ──")
-    log_p, true_means = make_gaussian_mixture(dim=2, n_components=3, sep=3.0)
-    x0 = np.zeros(2)
-    # use_mhg=True: applies the MH-Green correction for asymmetric proposals
-    # Lower alpha (0.65) for less persistence — better inter-mode exploration
-    r = compare(log_p, x0, N, "GaussMix-2D", ps=1.2, bu=1.2, alpha=0.65,
-                seed=SEED, use_mhg=True)
-    all_r.append(r)
-
-    def count_modes(chain, means, radius=1.8):
-        return sum(1 for m in means if np.any(norm(chain - m, axis=1) < radius))
-
-    modes_s = count_modes(r["chain_s"], true_means)
-    modes_c = count_modes(r["chain_c"], true_means)
-    print(f"  Standard MH:  ESS={r['ess_s']:6.1f}, accept={r['acc_s']:.2f}"
-          f", modes visited: {modes_s}/3")
-    print(f"  CU-MCMC:      ESS={r['ess_c']:6.1f}, accept={r['acc_c']:.2f}"
-          f", modes visited: {modes_c}/3")
-    print(f"  ESS ratio:    {r['ratio']:.2f}x  |  mean_diff={r['mean_diff']:.4f}"
-          f"  posterior_ok={r['posterior_ok']}")
-
-    # ── Summary ───────────────────────────────────────────────────────────────
-    print("\n" + "=" * 72)
-    print("RESULTS SUMMARY")
-    print("=" * 72)
-
-    ratios   = [x["ratio"] for x in all_r]
-    ok_all   = all(x["posterior_ok"] for x in all_r)
-    ess_gain = all(x["ratio"] > 1.0 for x in all_r)
-    scale_ratios = [x["ratio"] for x in scale_r]
-    scaling_ok = len(scale_ratios) >= 2 and scale_ratios[-1] > scale_ratios[0]
-
-    print(f"\n  ESS ratio range:           {min(ratios):.2f}x – {max(ratios):.2f}x")
-    print(f"  Posterior agreement (all): {ok_all}")
-    print(f"  ESS > 1 in all cases:      {ess_gain}")
-
+    print("=" * W)
+    print("PA-MCMC: Per-Dimension Adaptation via Robbins-Monro Targeting")
+    print("Eric D. Martin  —  ORCID 0009-0006-5944-1742")
+    print("=" * W)
     print()
-    status_A = "✅" if all(x["ratio"] > 1.0 for x in all_r[:2]) else "⚠ "
-    status_B = "✅" if scaling_ok else "⚠ "
-    status_ok = "✅" if ok_all else "⚠ "
+    print("  Algorithm: Metropolis-within-Gibbs + log-scale R-M targeting")
+    print("    propose:  x_prop[d] = x[d] + N(0, u[d])  [each dim independently]")
+    print("    adapt:    log u[d] += c × (accept − 0.44)  [burn-in only]")
+    print("    freeze:   u fixed at T_burn  →  production phase is exact MH")
+    print("  Equilibrium: accept_rate[d] → 0.44  →  u[d] → 2.38 × true_std[d]")
+    print()
 
-    print(f"  {status_A} Case A: ESS_CU vs ESS_std  "
-          f"(elongated={all_r[0]['ratio']:.2f}x, rosenbrock={all_r[1]['ratio']:.2f}x)")
-    print(f"  {status_B} Case B: Scaling 2D→10D  "
-          f"({scale_ratios[0]:.2f}x → {scale_ratios[-1]:.2f}x)")
-    print(f"  {status_ok} Posterior invariance across all cases")
+    # ── TEST A: 2D Elongated Gaussian ─────────────────────────────────────────
+    print("─" * W)
+    print("TEST A — 2D Elongated Gaussian  cond=100  angle=0")
+    print("  True std = [0.100, 1.000]   Oracle u = 2.38×std = [0.238, 2.380]")
+    print("  PRIMARY CLAIM: PA-MCMC closes the tuning gap automatically.")
+    print("─" * W)
+    _, _, ts2, _ = make_elongated_gaussian(dim=2, condition_number=100, angle_deg=0)
+    log_p2 = make_elongated_gaussian(dim=2, condition_number=100, angle_deg=0)[0]
+    rA = _run(log_p2, np.zeros(2), 2.38*ts2, true_std=ts2)
+    _print(rA, "A")
+    all_results.append(("A  ElongGauss-2D", rA))
 
+    # ── TEST A2: 5D Elongated Gaussian ────────────────────────────────────────
     print()
-    print("  Mechanism (Propagation Order Theorem):")
-    print("    u_t = α·u_{t-1} + (1−α)·|accepted_step|  [on acceptance]")
-    print("    u_t = α·u_{t-1}                           [on rejection]")
+    print("─" * W)
+    print("TEST A2 — 5D Elongated Gaussian  cond=100  angle=0")
+    print("  True std = [0.1, 1, 1, 1, 1]   PA-MCMC must separate u[0] from u[1..4].")
+    print("─" * W)
+    _, _, ts5, _ = make_elongated_gaussian(dim=5, condition_number=100, angle_deg=0)
+    log_p5 = make_elongated_gaussian(dim=5, condition_number=100, angle_deg=0)[0]
+    rA2 = _run(log_p5, np.zeros(5), 2.38*ts5, true_std=ts5)
+    _print(rA2, "A2")
+    print(f"     u_learned (all dims): {np.round(rA2['ul'], 3)}")
+    all_results.append(("A2 ElongGauss-5D", rA2))
+
+    # ── TEST B: Rosenbrock 2D (scope boundary) ────────────────────────────────
     print()
-    print("  Flat dimensions (k=2, f'=0):  large accepted steps → u_t grows → more exploration")
-    print("  Steep dimensions (k=1, f'≠0): small/no accepted steps → u_t decays → tight steps")
+    print("─" * W)
+    print("TEST B — Rosenbrock 2D  b=100  [SCOPE BOUNDARY]")
+    print("  Non-Gaussian, strongly coupled dims.  Claim does NOT apply here.")
+    print("─" * W)
+    log_rb = make_rosenbrock(dim=2)
+    c_ref, _ = standard_gibbs(log_rb, np.zeros(2), 50_000,
+                               np.array([0.5, 0.5]), np.random.default_rng(0))
+    emp_std = c_ref[10_000:].std(0)
+    rB = _run(log_rb, np.zeros(2), 2.38*emp_std)
+    _print(rB, "B",
+           note="Lower acceptance targets can improve ESS on banana geometry. "
+                "Scope: 0.44 target assumes near-Gaussian conditionals.")
+    all_results.append(("B  Rosenbrock-2D", rB))
+
+    # ── SUMMARY ───────────────────────────────────────────────────────────────
     print()
-    print("  For the formal transition kernel + MH-Green correction factor,")
-    print("  see: detailed_balance_notes()")
+    print("=" * W)
+    print("SUMMARY")
+    print("=" * W)
+    for label, r in all_results:
+        vs  = r['e2'] / max(r['e1'], 1.0)
+        gap = r['e2'] / max(r['e3'], 1.0)
+        ok  = "✅" if vs >= 1.5 and gap >= 0.80 else ("⚠ " if vs >= 1.0 else "❌")
+        print(f"  {ok} {label:<22}  naive→PA: {vs:.2f}×   PA→oracle: {gap:.2f}×")
+    print()
+    print("  Ergodicity: Roberts & Rosenthal (2009) §3 — hard freeze satisfies")
+    print("    vanishing adaptation; production kernel is standard fixed-u Gibbs.")
+    print("  Optimal target rate: Roberts, Gelman & Gilks (1997) — 0.44 for 1D MH.")
+    print("  Equilibrium scale:   u[d] ≈ 2.38 × true_std[d]  (Gaussian targets).")
+    print("  λ–k linkage: u[d] encodes curvature regime per §11 Order Theorem;")
+    print("    u[d] small ↔ k=1 (steep / tight), u[d] large ↔ k=2 (flat / open).")
 
 
 if __name__ == "__main__":
