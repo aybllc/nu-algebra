@@ -1,0 +1,103 @@
+# USO Rail Manifest v2.2.0
+# This file IS the rail. Filesystem structure is declared here, not in directory names.
+# Canonical since 2026-04-14. Deprecates: L{N}_{SemanticName} dir convention, .uso dir suffix, pure .uso files.
+
+uso:
+  version: "2.2.0"
+  canonical_since: "2026-04-14"
+  deprecates:
+    - naming: "L{N}_{SemanticName}"
+      reason: "Pedagogical-only; research use favors filesystem-safe naked names + metadata rails"
+      retained_as: "aliases"
+    - suffix: ".uso"  # on directories
+      reason: "Broke Python imports, caused glob self-match / vector collapse"
+    - pattern: "pure .uso files (bodiless)"
+      reason: "Required custom parsers; superseded by dual-extension NAME.uso.FORMAT"
+
+layers:
+  - id: l0
+    path: l0
+    display: L0
+    name: BrokenZero
+    role: perception_basis
+    aliases: [L0_BrokenZero]
+    tier_type: full
+    invariants: ["M = |n| + u"]
+
+  - id: l1
+    path: l1
+    display: L1
+    name: StateSpace
+    role: immutable_math
+    aliases: [L1_StateSpace]
+    tier_type: full
+
+  - id: l2
+    path: l2
+    display: L2
+    name: Algebra
+    role: nu_algebra
+    aliases: [L2_Algebra]
+    tier_type: full
+
+  - id: l2_5
+    path: l2_5
+    display: L2.5
+    name: StatisticalDomain
+    role: statistical_bridge
+    aliases: [L2.5_StatisticalDomain]
+    tier_type: bridge
+    note: "Bridge layer: translates algebraic N/U pairs <-> statistical quantities (CI, sigma, p-values)"
+
+  - id: l3
+    path: l3
+    display: L3
+    name: ExperimentalDesign
+    role: experiment_schema
+    aliases: [L3_ExperimentalDesign]
+    tier_type: full
+
+  - id: l4
+    path: l4
+    display: L4
+    name: UHA_Transport
+    role: encoding_transport
+    aliases: [L4_UHA_Transport]
+    tier_type: full
+
+  - id: l5
+    path: l5
+    display: L5
+    name: Governance
+    role: governance_justification
+    aliases: [L5_Governance]
+    tier_type: full
+
+  - id: l6
+    path: l6
+    display: L6
+    name: Provenance
+    role: provenance_archive
+    aliases: [L6_Provenance]
+    tier_type: full
+
+  - id: l7
+    path: l7
+    display: L7
+    name: Workspace
+    role: universal_science_object
+    aliases: [L7_Workspace]
+    tier_type: full
+
+index:
+  strategy: manifest-declared
+  vector_depth: 1
+  field_below_layer: flat
+  file_routing:
+    protocol_files: "**/*.uso.*"
+    manifests: "**/manifest.uso.yaml"
+
+provenance:
+  epoch: "v2.2.0"
+  epoch_start: "2026-04-14"
+  rename_delta_ref: "L6_Provenance_Ledger.json#epoch_2026-04-14"
