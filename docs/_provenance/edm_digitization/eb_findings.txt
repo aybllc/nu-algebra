@@ -1,0 +1,90 @@
+===========================================================================
+EB CARRIER FINDINGS RECOMPUTED FROM DIGITIZED FIGURE 1
+Swensson et al. (2024), Figure 1 — full per-session data extraction
+===========================================================================
+
+FINDING 1 — Inverse relationship as conserved quantity, with slack
+---------------------------------------------------------------------------
+Each session contains 5 trials. For Set 1 sessions:
+    e_IDKPTM(Set1) + e_correct + slack = 5,   slack ≥ 0
+Slack = trials in the third response class (incorrect, no response,
+        or off-task) — not separately tracked in the original coding.
+
+Per-child slack profile across intervention (Set 1 sessions only):
+
+  Child    N    mean slack   zero-slack     max   
+  Alex     41   1.27         16/41 (39%)   5     
+  Aden     28   0.11         25/28 (89%)   1     
+  Ida      14   1.07         6/14 (43%)   4     
+
+Reading: Aden showed near-zero slack throughout intervention (89% of
+sessions had zero third-class trials), indicating a clean transition from
+the trained mand to the correct intraverbal. Alex (39%) and Ida (43%) had
+substantially more third-class responding — slack rates that the standard
+coding did not separately surface.
+
+
+FINDING 2 — Stimulus-control onset locatable to a session
+---------------------------------------------------------------------------
+Operationalisation: first session s* such that for all s ≥ s*,
+    e_IDKPTM(s) + e_correct(s) ≥ 4   (lower-bound on the conserved sum)
+This is the first session at which the child is reliably producing either
+the trained mand or the correct intraverbal on at least 4 of 5 trials —
+and continues to do so for the remainder of intervention.
+
+  Alex: never reached strict criterion (high variability)
+           soft criterion (≥85% of tail sessions sum ≥ 4): session 22
+  Aden: stimulus-control onset at session 10
+  Ida: stimulus-control onset at session 15
+
+Reading: Aden achieved stimulus control immediately upon intervention onset
+(session 10), Ida at session 15. Alex's high session-to-session variability
+means he never satisfies the strict criterion — a structural finding the
+standard mastery-criterion lens does not surface.
+
+
+FINDING 3 — Aden's six-week break as a maintenance probe
+---------------------------------------------------------------------------
+The break occurred between sessions 32 and 33 (figure asterisk position).
+Aden's IDKPTM had ALREADY been declining before the break as he learned
+answers — so the break is not a clean asymptote-vs-asymptote comparison.
+It is, however, a 6-week interruption of an active learning curve.
+
+  Pre-break  (sessions 30-32) IDKPTM: [2, 2, 4] (= [40, 40, 80]%)
+  Post-break (sessions 33-35) IDKPTM: [2, 2, 2] (= [40, 40, 40]%)
+
+EB encoding (Reading R1, range-faithful):
+  Pre  = (60, 20)    hull = [40, 80]
+  Post = (40, 0)    hull = [40, 40]
+  ΔAden = Post ⊕ ((-1) ⊙ Pre) = (-20, 20)
+  Hull of ΔAden = [-40, 0]
+
+Reading: The six-week interruption maps to ΔAden = (-20, 20) with hull
+[-40, 0]. The centre is a 20-percentage-point drop in IDKPTM rate; the
+hull excludes any gain (right edge sits at zero) and admits up to a 40-point
+decline. The signed-residual reading places this firmly on the EB carrier's
+signed half — the operator-level B²≠id diagnostic activates here.
+Important caveat: pre-break IDKPTM was already declining as Aden learned
+answers, so this does NOT cleanly isolate the break-induced decrement from
+the ongoing learning trajectory. The figure-derived comparison would benefit
+from per-trial timing data to separate within-session variability from
+across-break decay.
+
+
+FINDING 4 — Cross-child mastery-time ratios with procedural cancellation
+---------------------------------------------------------------------------
+Mastery sessions confirmed from digitization:
+  Alex 60 sessions    Aden 39 sessions    Ida 26 sessions
+
+Under EB division (Prop 28.2.1, Martin 2026), shared procedural θ cancels
+in the centre rail. Bound formula: b_ξ = |e_u|·b_v/e_v² + b_u/|e_v| + b_u·b_v/e_v²
+Encoding mastery as (n, 5) — bound ±5 sessions for procedural variation:
+
+  Ratio          centre     bound      hull                  
+  Aden/Alex      0.650      0.144      [0.51, 0.79]
+  Ida/Alex       0.433      0.126      [0.31, 0.56]
+  Ida/Aden       0.667      0.230      [0.44, 0.90]
+
+Reading: child-specific intraverbal-acquisition rates differ by factor 2-3
+with shared procedure (telehealth coaching, prompt schedule, trial structure)
+algebraically removed from the centre comparison.
