@@ -1,0 +1,66 @@
+{
+  "source_image": "/mnt/data/bin2015-fig-0001-m.jpg",
+  "image_size_px": {
+    "width": 1646,
+    "height": 2048
+  },
+  "preprocessing": {
+    "grayscale_command": "convert bin2015-fig-0001-m.jpg -colorspace Gray -depth 8 fig_gray.pgm",
+    "black_pixel_threshold": "gray < 90 for marker/line sampling",
+    "gray_bar_pixel_threshold": "120 < gray < 230 for correct-answer bars",
+    "gray_bar_component_filter": "vertical segment height > 35 px, component width >= 5 px, bottom within 20 px of panel x-axis",
+    "set1_marker_filter": "15x15 sampling window at calibrated session x response y intersections; black-pixel density threshold >= 45; then visual QA/manual correction for triangle overlap and axis/tick false positives",
+    "set2_marker_filter": "manual QA from isolated black triangle symbols after affine calibration; values snapped to nearest integer count 0-5",
+    "rounding_rule": "all response values snapped to nearest integer in [0,5]"
+  },
+  "axis_calibration": {
+    "Alex": {
+      "x0_px_session0": 113.5,
+      "x_px_per_session": 21.42,
+      "y0_px_response0": 617.9,
+      "y_px_per_response": 100.2,
+      "session_formula": "session = round((x_px - x0)/xscale)",
+      "response_formula": "response = round((y0 - y_px)/yscale)"
+    },
+    "Aden": {
+      "x0_px_session0": 113.0,
+      "x_px_per_session": 21.36,
+      "y0_px_response0": 1251.4,
+      "y_px_per_response": 99.1,
+      "session_formula": "session = round((x_px - x0)/xscale)",
+      "response_formula": "response = round((y0 - y_px)/yscale)"
+    },
+    "Ida": {
+      "x0_px_session0": 114.0,
+      "x_px_per_session": 21.39,
+      "y0_px_response0": 1872.5,
+      "y_px_per_response": 99.1,
+      "session_formula": "session = round((x_px - x0)/xscale)",
+      "response_formula": "response = round((y0 - y_px)/yscale)"
+    }
+  },
+  "phase_boundaries_session_approx": {
+    "Alex": {
+      "baseline_or_teaching_zero_run": "1-7",
+      "intervention_start_approx": 8,
+      "five_target_change_approx": 41
+    },
+    "Aden": {
+      "baseline_zero_run": "1-9",
+      "intervention_start_approx": 10,
+      "five_target_change_approx": 34,
+      "break_marker_approx": 31
+    },
+    "Ida": {
+      "baseline_zero_run": "1-13",
+      "intervention_start_approx": 14,
+      "five_target_change_approx": 24
+    }
+  },
+  "limitations": [
+    "This is a digitized reconstruction from the published figure, not author-provided raw data.",
+    "Black square Set 1 values were visually QA-corrected where triangle probes or x-axis ticks overlapped the sampling window.",
+    "Set 2 triangle probes are sparse and were manually digitized; sessions are approximate to the nearest x-axis tick.",
+    "Correct-answer bars were automatically extracted and snapped to integer response values; very late Alex bars are lower confidence because bars and final Set 1 markers overlap near the right edge."
+  ]
+}
