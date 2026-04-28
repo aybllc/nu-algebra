@@ -1,0 +1,85 @@
+===========================================================================
+EB CARRIER FINDINGS RECOMPUTED FROM CORRECTED DIGITIZED FIGURE 1 — V3
+Swensson et al. (2024), Figure 1 — corrected session-level reconstruction
+===========================================================================
+
+V3 CORRECTION NOTE
+---------------------------------------------------------------------------
+Version 3 corrects the prior under-detection of Alex's late-phase gray
+correct-answer bars, especially sessions 55-62. Alex sessions 48-62 were
+rechecked with a calibrated digital grid. The corrected values reduce Alex's
+mean slack and change the response-system stability result from "never strict"
+to "late strict stability at session 53."
+
+CORE CONSERVATION EQUATION
+---------------------------------------------------------------------------
+Each Set 1 intervention session contains 5 trials:
+
+    I_t + K_t + S_t = 5
+
+where:
+    I_t = independent IDKPTM Set 1 responses
+    K_t = independent correct answers
+    S_t = slack/residual trials with neither independent IDKPTM nor
+          independent correct answering
+
+PRIMARY FINDING — Slack as a third behavioral class
+---------------------------------------------------------------------------
+Corrected Set 1 intervention slack profile:
+
+  Child    N    mean slack   zero-slack        max   mean I_t   mean K_t
+  Alex     50   0.84         25/50 (50.0%)     5     2.34       1.82
+  Aden     28   0.107        25/28 (89.3%)     1     3.25       1.643
+  Ida      14   1.071        6/14  (42.9%)     4     0.929      3.000
+
+Reading: Aden remains the near-zero-slack case. Alex is less slack-heavy
+than the earlier digitization suggested after late gray bars were recovered,
+but still shows more residual response space than Aden. Ida remains the faster
+mastery / higher-slack profile.
+
+SECONDARY FINDING — EB-operationalized response-system stability
+---------------------------------------------------------------------------
+Criterion: first Set 1 intervention session s* such that every later Set 1
+intervention session has I_t + K_t >= 4, equivalently S_t <= 1.
+
+  Alex: session 53 (late stability after variable acquisition path)
+  Aden: session 10 (stability coincident with intervention onset)
+  Ida:  session 15 (stability four sessions into intervention)
+
+Reading: the corrected Alex bars materially change this result. Alex no longer
+fails strict stability; he reaches it late.
+
+SECONDARY FINDING — Aden's six-week break as a qualified signed contrast
+---------------------------------------------------------------------------
+The break occurred between sessions 32 and 33. Aden's IDKPTM was already
+declining before the break, so this is not a clean maintenance-probe contrast.
+It remains a qualified signed EB comparison.
+
+  Pre-break  sessions 30-32 IDKPTM: [2, 2, 4] = [40, 40, 80]%
+  Post-break sessions 33-35 IDKPTM: [2, 2, 2] = [40, 40, 40]%
+
+Reading R1:
+  Pre  = (60, 20)  hull [40, 80]
+  Post = (40, 0)   hull [40, 40]
+  Delta_Aden = Post + (-1)*Pre = (-20, 20)
+  Hull = [-40, 0]
+
+Reading: centre drop of 20 percentage points; hull excludes gain but includes
+no-change at the upper edge. Interpret as interruption of an active learning
+curve, not a clean asymptote-vs-asymptote maintenance test.
+
+SECONDARY / SENSITIVITY FINDING — Cross-child mastery-time ratios
+---------------------------------------------------------------------------
+Mastery sessions remain:
+  Alex = 60, Aden = 39, Ida = 26
+
+Using sensitivity encoding (n, 5), where ±5 sessions is a modeling tolerance:
+
+  Ratio          centre     bound      hull
+  Aden/Alex      0.650      0.144      [0.51, 0.79]
+  Ida/Alex       0.433      0.126      [0.31, 0.56]
+  Ida/Aden       0.667      0.230      [0.44, 0.90]
+
+Reading: useful mathematical demonstration, but secondary to the slack finding
+because the ±5-session bound is a modeling choice, not an observed bound.
+===========================================================================

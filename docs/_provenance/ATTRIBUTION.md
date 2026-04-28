@@ -7,12 +7,15 @@ Three independent digitizations of Swensson et al. (2024) Figure 1.
 | **CC-v2** (`swensson_figure1_digitization_2026-04-28.md`) | Claude Code (this session) | Manual eyeball at 2128×2647 hi-res JPG, panel split via PIL | Per-session ±1 noise, phase aggregates robust |
 | **Ai1** (`ai1_digitization/`) | External Claude instance (web), first-pass | Pixel-level affine calibration; 1646×2048 px source | 126 rows; missed Alex session 11 |
 | **Claude-v2** (`claude_v2_digitization/`) | External Claude instance (web), second-pass | Automated bar-detection with iterative debugging (AA gap tolerance, line-passing-through-bar handling); reports slack profile per child | 127 rows; preferred source per Eric's manual overlay check |
+| **Claude-v3** (`claude_v3_digitization/`) | External Claude instance (web), third-pass with corrected Alex late-phase digitization | Calibrated overlay grid recovery of Alex sessions 48-62 (under-detected gray bars); patched 13 Alex rows with confidence/notes columns; produces corrected slack profile | 127 rows total; canonical retired version; bundle includes corrected MD/DOCX paper, findings TXT, correction log |
 
 (Earlier git commits referred to claude_v2_digitization as "edm_digitization"; that was a labeling error on my part — the files were not produced by Eric. The directory rename in commit-rename preserves attribution accuracy.)
 
 ## Convergence
 
-All three sources agree within 0.02 on phase means; mastery sessions identical (Alex 60, Aden 39, Ida 25); 5-targets boundary identical (s34 Aden, s41 Alex). Per-session integers diverge ±1 typical, ±2 worst-case.
+All four sources agree within 0.02 on phase means; mastery sessions identical (Alex 60, Aden 39, Ida 25); 5-targets boundary identical (s34 Aden, s41 Alex). Per-session integers diverge ±1 typical, ±2 worst-case.
+
+The v3 correction (Alex sessions 48-62) reduces the Alex zero-slack rate from 39% (Claude-v2 reading, conservative due to bar-detection failure on dense post-mastery panel) to 50% (corrected). Aden 89.3% and Ida 42.9% are unchanged. The structural cross-child contrast is preserved across all four sources.
 
 ## Load-bearing claim
 
