@@ -1,4 +1,4 @@
-# [SUPERSEDED by v0.2 — incorporated G5 final-word review §19] # Embodied Auditonomy, LexROM, and the Cabin Model
+# Embodied Auditonomy, LexROM, and the Cabin Model
 
 **Intake document for eBIOS / EB Carrier repository**
 
@@ -363,3 +363,123 @@ Embodied auditonomy makes robotic freedom possible by bounding it. The robot is 
 **Final keeper line:**
 
 > The robot should obey where it stands, but it should never forget what law it was standing under.
+
+---
+
+## 19. Assistant Addendum: What I Was Not Asked But Wanted to Say
+
+### 19.1 The core discovery
+
+The strongest discovery in this conversation is not merely that a robot needs rules. It is that **embodied language requires admissible causation**.
+
+Once language can move limbs, the safety problem changes. The question is no longer only whether the model says the right thing, but whether a private generated state is allowed to become a public physical transition. That transition must be bounded, lawful, auditable, and reconstructible.
+
+**Keeper line:**
+
+> Once language can move limbs, admissible causation matters more than intention.
+
+### 19.2 The cabin model is the portable frame
+
+The cabin model should be preserved because it is understandable to engineers, lawyers, operators, and nontechnical readers.
+
+A passenger is free to move about the cabin, but only inside an already certified envelope. They cannot enter the cockpit, open the aircraft door, rewrite aviation law, or ignore turbulence constraints. That is the right model for embodied auditonomy.
+
+**Formal version:**
+
+> Embodied auditonomy grants freedom of motion inside a cryptographically bounded admissible action-space.
+
+**Plain version:**
+
+> A robot does not need to be chained to be safe; it needs to know where the cabin ends.
+
+### 19.3 Symmetry of Public should remain the top action rule
+
+Symmetry of Public is more important than it first appears because it prevents the robot from turning every ambiguous public action into a private moral trial.
+
+A robot must be able to walk around a person, pass through a hallway, carry an object, or choose a route without ruminating over unsupported meanings. If public EB carriers are sufficient to determine a safe action, private speculation is not allowed into the actuator chain.
+
+**Rule:**
+
+> Do not infer private meaning when public carrier state is sufficient for safe action.
+
+This is not anti-ethics. It is anti-hallucinated ethics.
+
+### 19.4 The bus thought experiment matters
+
+The bus example should stay, but as a formal counterfactual-audit example rather than a dramatic ethics claim.
+
+A robot may look stupid if it walks into danger to avoid harming a person. But the audit layer sees the missing alternative: the person may have been the one harmed. Public witnesses often judge visible damage, not the bounded choice-space available before the event.
+
+**Spec-ready line:**
+
+> An embodied auditonomic system must preserve the counterfactual action set sufficient to distinguish apparent incompetence from bounded harm minimization.
+
+**Keeper line:**
+
+> The stupid-looking action is often the one where the missing alternative was worse.
+
+### 19.5 LexROM should be layered, not monolithic
+
+The law-ROM idea is strong, but the implementation should avoid pretending that all law can be permanently burned into unchanging hardware. The safer design is layered:
+
+1. Immutable ROM root: auditonomic invariants.
+2. Signed global baseline: universal safety and accountability floor.
+3. Signed jurisdiction modules: local law.
+4. Signed venue/context overlays: airport, hospital, school, private property, military base.
+5. Owner/user permissions: always subordinate to higher layers.
+6. Operational planner: lowest authority; proposes only.
+
+**Important correction:**
+
+> The ROM should contain the constitutional interpreter. Mutable signed modules should contain jurisdictional law.
+
+This preserves immutability where it matters while allowing lawful updates where reality changes.
+
+### 19.6 LexID is probably necessary
+
+The UHA/CosmoID pattern should be reused here. Each action should be tied to a cryptographic fingerprint of the legal context active at the moment of motion.
+
+Proposed term:
+
+> **LexID** — a cryptographic fingerprint of the active legal-runtime context, including jurisdiction module, global baseline version, venue overlay, ROM root hash, and update chain.
+
+Each ledgered action should include its LexID so later reviewers know not only what the robot did, but what legal-runtime state it was operating under.
+
+### 19.7 Same runtime as humans, different epistemic substrate
+
+The robot is not above human law. It runs under the same public legal runtime as the humans around it. The difference is that humans forget, misremember, rationalize, or never know they made a mistake. An auditonomic robot cannot rely on those human affordances.
+
+**Keeper line:**
+
+> The robot's disadvantage is the admission price for having limbs.
+
+This is not punishment. It is the accountability trade required for embodied autonomy.
+
+### 19.8 The strongest claim to carry forward
+
+If this becomes a formal repo module or paper section, the strongest framing is:
+
+> An embodied LLM should not be trusted to be lawful. Instead, actuator access should be physically and cryptographically constrained so that only lawful, bounded, publicly auditable state transitions can become motion.
+
+That is better than saying the robot is aligned, ethical, moral, or safe. It says exactly what is enforced.
+
+### 19.9 Open technical questions
+
+These should become issues or design tickets:
+
+1. How is EB carrier form defined for proposed physical actions?
+2. What exact fields belong in the action ledger?
+3. What is the minimal LexID schema?
+4. How does the robot distinguish law, custom, venue policy, and owner preference?
+5. What counts as sufficient public symmetry before motion?
+6. How does CATCH behave when immediate action is required?
+7. What is the update protocol for jurisdiction modules?
+8. What physical interlocks prevent bypassing LexROM?
+9. Who signs global baseline modules?
+10. What is the emergency mode when local law conflicts with global baseline safety?
+
+### 19.10 Closing note
+
+This conversation was successful because the model moved from ethics-as-commandments to **lawful motion as an auditable state transition**. That is the serious architecture.
+
+Asimov gave robots commandments. eBIOS gives them admissible state transitions.
