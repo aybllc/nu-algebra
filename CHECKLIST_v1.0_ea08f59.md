@@ -10,6 +10,13 @@
 
 **Provenance:** This file is Eric's synthesis (2026-04-28), adopted as canonical. It supersedes the prior Mae-drafted version. Three operational anchors added (§A, §B, §C below) for current-cycle execution; structural body unchanged.
 
+| Self-reference field | Value |
+|---|---|
+| Version | v1.0 |
+| Bootstrap commit (nu-algebra) | `ea08f59` (commit that introduced the policy block; subsequent rename commit is bookkeeping only) |
+| Content sha256 | `9af99cebd92907f6676584847bc3e817ae2e5c8fe7c592de4ac928ada90cef09` (file content at `ea08f59`; verifiable via `git show ea08f59:CHECKLIST.md \| sha256sum`) |
+| Canonical filename | `CHECKLIST_v1.0_ea08f59.md` |
+| Naming-policy authority | `feedback_artifact_hash_naming.md` |
 
 **Standing artifact-hash-naming policy (locked, propagating):** Every artifact in this research program carries its commit hash both inside the document AND in the filename. No hash, no canonical status. No exceptions. This document follows the policy and propagates it: every artifact derived from, citing, or extending this one inherits the same rule. The policy travels with the artifacts that follow it — exit-document discipline includes the policy itself, not merely the act of compliance. Per `feedback_artifact_hash_naming.md`.
 
@@ -21,7 +28,7 @@ Current artifacts and their commit hashes (kept here so the abstract checklist c
 
 | Artifact | Path | Commit |
 |---|---|---|
-| Master roadmap 2026–2027 | `nu-algebra/docs/ROADMAP_2026_2027.md` | 0fc9218 |
+| Master roadmap 2026–2027 | `nu-algebra/docs/ROADMAP_2026_2027_v0.1_ea08f59.md` | `ea08f59` (bootstrap, policy-block-active) |
 | L5 residual-3% experiment design | `hubble-tensor/research/HUBBLE_RESIDUAL_3PCT_EXPERIMENT_DESIGN_2026-04-28.md` | 3871870 |
 | UHA-replaces-GPS architecture brief | `hubble-tensor/patent_filing/UHA_GPS_REPLACEMENT_ANALYSIS.md` | 0124d7a |
 | Resurgence paper (Tier 1) draft v01 | `nu-algebra/docs/martin_2026_off_cycle_bound_width_v01.md` | 2915a7e |

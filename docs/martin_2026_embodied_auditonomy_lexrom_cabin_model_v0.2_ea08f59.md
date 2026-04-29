@@ -11,6 +11,13 @@
 | Status | Concept architecture draft; not legal advice; not safety certification |
 | Core phrase | A robot does not need to be chained to be safe; it needs to know where the cabin ends. |
 
+| Self-reference field | Value |
+|---|---|
+| Version | v0.2 |
+| Bootstrap commit (nu-algebra) | `ea08f59` (commit that introduced the policy block; subsequent rename commit is bookkeeping only) |
+| Content sha256 | `7fd260a51c2b42ce52d4f50d0107cd92c9c14f5b9f15df50fe4230cc208d47c5` (file content at `ea08f59`; verifiable via `git show ea08f59:docs/martin_2026_embodied_auditonomy_lexrom_cabin_model_v0_2.md \| sha256sum`) |
+| Canonical filename | `martin_2026_embodied_auditonomy_lexrom_cabin_model_v0.2_ea08f59.md` |
+| Naming-policy authority | `feedback_artifact_hash_naming.md` |
 
 **Standing artifact-hash-naming policy (locked, propagating):** Every artifact in this research program carries its commit hash both inside the document AND in the filename. No hash, no canonical status. No exceptions. This document follows the policy and propagates it: every artifact derived from, citing, or extending this one inherits the same rule. The policy travels with the artifacts that follow it — exit-document discipline includes the policy itself, not merely the act of compliance. Per `feedback_artifact_hash_naming.md`.
 

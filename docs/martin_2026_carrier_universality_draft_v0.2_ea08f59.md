@@ -10,6 +10,13 @@
 
 > *EB is not a theory of uncertainty. It is a theory of how certainty is accessed.*
 
+| Self-reference field | Value |
+|---|---|
+| Version | v0.2 |
+| Bootstrap commit (nu-algebra) | `ea08f59` (commit that introduced the policy block; subsequent rename commit is bookkeeping only) |
+| Content sha256 | `caa1a4736fe12cec31ce3b8f45e7f7ed717a06518ac88588bf5476b898f1653f` (file content at `ea08f59`; verifiable via `git show ea08f59:docs/martin_2026_carrier_universality_draft.md \| sha256sum`) |
+| Canonical filename | `martin_2026_carrier_universality_draft_v0.2_ea08f59.md` |
+| Naming-policy authority | `feedback_artifact_hash_naming.md` |
 
 **Standing artifact-hash-naming policy (locked, propagating):** Every artifact in this research program carries its commit hash both inside the document AND in the filename. No hash, no canonical status. No exceptions. This document follows the policy and propagates it: every artifact derived from, citing, or extending this one inherits the same rule. The policy travels with the artifacts that follow it — exit-document discipline includes the policy itself, not merely the act of compliance. Per `feedback_artifact_hash_naming.md`.
 
