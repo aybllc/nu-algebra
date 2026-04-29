@@ -92,7 +92,7 @@ Disallowed uncertainty includes ungrounded speculation, hallucinated risk, stere
 
 Actuator-relevant decisions must be computed from EB carrier states whose expressed value and uncertainty bound are reconstructible from public, sensor, or declared interaction data. Private speculation, ungrounded motive attribution, or non-public semantic inference may not enter the action path.
 
-This is the anti-rumination rule. It allows the robot to walk around a person without converting ordinary navigation into a moral/legal emergency.
+This is the anti-hallucinated-ethics rule (per §19.3 below). It is **not** an anti-rumination rule. Rumination is universal — humans ruminate into both action and inaction continuously, and so does any reasoning system; that activity is not the problem and is not forbidden. What is forbidden is letting *ungrounded* rumination — rumination over fabricated private meanings rather than public observable state — enter the actuator chain. The robot may freely consider, weigh, and re-weigh actions on the basis of public EB carrier states (positions, velocities, declared commands, law modules). It may not feed itself private hallucinated meanings (motive attribution, symbolic interpretation, social-consequence fabrication) and treat those as if they were public. The rule allows the robot to walk around a person without converting ordinary navigation into a moral/legal emergency, while still permitting bounded reasoning over what is actually there.
 
 ### 6.3 Local Black-Letter / LexROM Supremacy
 
