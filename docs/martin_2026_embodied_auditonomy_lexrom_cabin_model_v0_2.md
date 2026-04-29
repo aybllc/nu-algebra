@@ -11,6 +11,9 @@
 | Status | Concept architecture draft; not legal advice; not safety certification |
 | Core phrase | A robot does not need to be chained to be safe; it needs to know where the cabin ends. |
 
+
+**Standing artifact-hash-naming policy (locked, propagating):** Every artifact in this research program carries its commit hash both inside the document AND in the filename. No hash, no canonical status. No exceptions. This document follows the policy and propagates it: every artifact derived from, citing, or extending this one inherits the same rule. The policy travels with the artifacts that follow it — exit-document discipline includes the policy itself, not merely the act of compliance. Per `feedback_artifact_hash_naming.md`.
+
 ## 1. Executive Summary
 
 This document captures a design conversation about how an LLM could safely inhabit a fully limbed robotic support system under eBIOS-style auditonomy. The central conclusion is that embodied autonomy should not be governed by free-form language output, soft policy, or moral improvisation. Instead, the robot should be free to act only inside a bounded, auditable, legally constrained action-space: **the cabin**.

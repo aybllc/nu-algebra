@@ -10,6 +10,9 @@
 
 **Provenance:** This file is Eric's synthesis (2026-04-28), adopted as canonical. It supersedes the prior Mae-drafted version. Three operational anchors added (§A, §B, §C below) for current-cycle execution; structural body unchanged.
 
+
+**Standing artifact-hash-naming policy (locked, propagating):** Every artifact in this research program carries its commit hash both inside the document AND in the filename. No hash, no canonical status. No exceptions. This document follows the policy and propagates it: every artifact derived from, citing, or extending this one inherits the same rule. The policy travels with the artifacts that follow it — exit-document discipline includes the policy itself, not merely the act of compliance. Per `feedback_artifact_hash_naming.md`.
+
 ---
 
 ## §A. Operational anchors — current cycle

@@ -10,6 +10,9 @@
 
 > *EB is not a theory of uncertainty. It is a theory of how certainty is accessed.*
 
+
+**Standing artifact-hash-naming policy (locked, propagating):** Every artifact in this research program carries its commit hash both inside the document AND in the filename. No hash, no canonical status. No exceptions. This document follows the policy and propagates it: every artifact derived from, citing, or extending this one inherits the same rule. The policy travels with the artifacts that follow it — exit-document discipline includes the policy itself, not merely the act of compliance. Per `feedback_artifact_hash_naming.md`.
+
 ---
 
 ## Provenance note
