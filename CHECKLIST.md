@@ -26,7 +26,7 @@ Current artifacts and their commit hashes (kept here so the abstract checklist c
 | Swensson STATUS_RETIRED | `nu-algebra/docs/_provenance/swensson_STATUS_RETIRED.md` | aedda53 |
 | Three-source reconciliation v2.2 | `nu-algebra/docs/_provenance/swensson_figure1_reconciliation_v2.2.md` | 23e2d44 |
 | EB carrier benchmark vs SPICE | `uha/papers/benchmark_report.md` | 2026-03-26 |
-| Priority hash deposit | DOI 10.5281/zenodo.19676236 | external |
+| Priority hash deposit | DOI 10.5281/zenodo.19676237 (r1 priority lock) | external |
 | EB Carrier theorem | RSOS-260797 r4 (under review) | external |
 | UHA provisional | US 63/902,536 | external |
 | AMS Memoirs submission | 260427-umo36 | external |
