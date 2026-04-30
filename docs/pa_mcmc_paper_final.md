@@ -1,7 +1,7 @@
 # λ–k Order Selection, EMA Contraction, and Equilibrium-Seeking Gibbs for Automatic Scale Discovery
 
 **Eric D. Martin**  
-Independent Researcher | ORCID: 0009-0006-5944-1742 | msphdba@gmail.com  
+Independent Researcher | ORCID: 0009-0006-5944-1742 | doctor.eric.martin@gmail.com  
 April 2026
 
 ---

@@ -6,7 +6,7 @@
 
 **Author:** Eric D. Martin, Independent Researcher
 **ORCID:** 0009-0006-5944-1742
-**Email:** msphdba@gmail.com
+**Email:** doctor.eric.martin@gmail.com
 
 ---
 

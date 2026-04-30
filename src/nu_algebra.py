@@ -84,26 +84,40 @@ class NU:
         """
         return NU(self.n - other.n, self.u + other.u)
     
-    def mul(self, other: 'NU') -> 'NU':
+    def mul(self, other: 'NU', lam: float = 0.0) -> 'NU':
         """
-        Multiplication: (n₁, u₁) ⊗ (n₂, u₂) = (n₁n₂, |n₁|u₂ + |n₂|u₁)
-        
-        The absolute values ensure uncertainty remains non-negative
-        for all input combinations.
-        
+        Multiplication: (n₁, u₁) ⊗ (n₂, u₂)
+                      = (n₁n₂, |n₁|u₂ + |n₂|u₁ + λ·u₁u₂)
+
+        Two regimes, both proved in Martin (2026a):
+          lam = 0 : first-order tightness (default). Unique first-order
+                    approximation within the A1–A6 summary class.
+          lam = 1 : exact tightness. Uniquely forced under exact A3;
+                    this is the exact-uniqueness regime of Theorem 5.8.
+
+        The default is lam = 0 to preserve backward compatibility with
+        the 70,054-test validation suite, which is keyed to the
+        first-order form. Callers wanting the exact-tightness regime
+        pass lam = 1.0 explicitly.
+
         Args:
-            other: Another N/U pair
-        
+            other: Another N/U pair.
+            lam:   Tightness parameter. 0.0 = first-order (default),
+                   1.0 = exact.
+
         Returns:
-            New N/U pair with product nominal and propagated uncertainty
-        
-        Example:
-            >>> NU(4.0, 0.1).mul(NU(3.0, 0.2))
+            New N/U pair with product nominal and propagated uncertainty.
+
+        Examples:
+            >>> NU(4.0, 0.1).mul(NU(3.0, 0.2))              # lam=0
             NU(12.0, 1.1)
+            >>> NU(4.0, 0.1).mul(NU(3.0, 0.2), lam=1.0)     # exact
+            NU(12.0, 1.12)
         """
         return NU(
             self.n * other.n,
             abs(self.n) * other.u + abs(other.n) * self.u
+                + lam * self.u * other.u
         )
     
     def scalar(self, a: float) -> 'NU':

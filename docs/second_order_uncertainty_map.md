@@ -227,4 +227,4 @@ See implementation plan in the CU-MCMC development document.
 - H₀ multiprobe: `multiresolution-cosmology/COMPREHENSIVE_MULTIPROBE_RESULTS_SUMMARY.md`
 - Morton encoding: `unified_math_reference.md §3`
 - N/U Psychology: `nu-algebra/examples/nua_psychology/`
-- SSOT future work: `nu-algebra/o1.txt §8.3`
+- SSOT future work: `nu-algebra/nu_algebra_jcp_manuscript_outline.md §8.3`

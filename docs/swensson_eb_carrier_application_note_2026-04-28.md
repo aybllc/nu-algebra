@@ -1,4 +1,4 @@
-# A Methodological Note on Applying the EB Carrier Algebra to IOA-Reported Behavioral Data
+# A Methodological Note on Applying the Substrate-Pair Carrier ($\mathbb{R}_{\geq 0} \times \mathbb{R}_{\geq 0}$) to IOA-Reported Behavioral Data
 
 **Worked example using Swensson et al. (2024)**
 
@@ -11,7 +11,7 @@ Date: 2026-04-28
 
 ## Abstract
 
-This note demonstrates the application of the Expressed--Bound (EB) carrier algebra — the unique pair algebra over $\mathbb{R} \times \mathbb{R}_{\geq 0}$ satisfying axioms A1--A6 (Martin, 2026, RSOS-260797 r4) — to interobserver-agreement (IOA) data reported in Swensson et al. (2024). I convert reported IOA percentages to explicit uncertainty bounds via a worst-case interval-arithmetic conversion, then propagate those bounds through aggregation across participants. The contribution is methodological: a deterministic, audit-defensible way to make IOA-implied measurement precision arithmetic-ready. The worked example does not alter Swensson et al.'s substantive findings, which were already well supported by their methods.
+This note demonstrates uncertainty propagation on interobserver-agreement (IOA) data reported in Swensson et al. (2024). The data are non-negative counts — number of trials with target behavior, observation agreements — so the natural carrier is the substrate-pair $\mathbb{R}_{\geq 0} \times \mathbb{R}_{\geq 0}$ with bound discipline $u \leq n$, the subordinate-corollary form of the Expressed--Bound (EB) rigidity theorem (Martin, 2026, RSOS-260797 r4; Memoirs treatment Ch 2, Ch 7). I convert reported IOA percentages to explicit uncertainty bounds via a worst-case interval-arithmetic conversion, then propagate those bounds through aggregation across participants. The contribution is methodological: a deterministic, audit-defensible way to make IOA-implied measurement precision arithmetic-ready. The worked example does not alter Swensson et al.'s substantive findings, which were already well supported by their methods.
 
 ---
 
@@ -19,23 +19,31 @@ This note demonstrates the application of the Expressed--Bound (EB) carrier alge
 
 Interobserver agreement (IOA) is a standard reliability metric in applied behavior analysis. It is reported as a percentage, which indicates measurement reliability but does not propagate through arithmetic operations used to aggregate observations across sessions, participants, or studies. When researchers compute composite scores, weighted means, or meta-analytic estimates, the implied uncertainty from IOA is typically left implicit.
 
-This note shows that the EB carrier algebra (Martin, 2026) — a pair-valued arithmetic in which each value carries an explicit non-negative uncertainty bound — provides a deterministic conversion from IOA to propagatable bounds. The conversion is conservative and reproducible. It is restricted to the measurement layer; it does not perform statistical inference, model temporal dependencies, or replace standard behavioral analysis methods.
+This note shows that a pair-valued arithmetic — in which each measurement is encoded as a non-negative count $n$ paired with a non-negative bound $u$, with the discipline that $u \leq n$ — provides a deterministic conversion from IOA to propagatable bounds. The arithmetic is the subordinate-corollary form of the EB carrier algebra (Martin, 2026), restricted to non-negative substrate data. The conversion is conservative and reproducible. It is restricted to the measurement layer; it does not perform statistical inference, model temporal dependencies, or replace standard behavioral analysis methods.
 
 The worked example uses IOA values from Swensson et al. (2024), a multiple-baseline study of caregiver-implemented telehealth coaching for three children with autism spectrum disorder.
 
 ---
 
-## 2. The EB Carrier Algebra: Formal Foundation
+## 2. Formal Foundation: Substrate-Pair Carrier with Bound Discipline
 
-The EB carrier is the ordered pair $(e, b) \in \mathbb{R} \times \mathbb{R}_{\geq 0}$, where $e$ is an asserted expressed value and $b$ is a non-negative admissible deviation. The pair algebra is fixed by six axioms (A1--A6) imposing exact enclosure preservation, exact tightness, commutativity, associativity, non-negativity of bounds, and local realisability with bounded memory and latency. The unique algebra under these axioms (Martin, 2026, RSOS-260797 r4, currently under review) has the following operations:
+The full Expressed--Bound (EB) carrier $\mathbb{R} \times \mathbb{R}_{\geq 0}$ is the unique pair algebra under axioms A1--A6 of Martin (2026, RSOS-260797 r4). The full carrier is appropriate for signed expressed values (centre-and-radius interval representations on the real line). Behavioral count data, however, are non-negative throughout: trial counts, agreement counts, and percentages all live in $\mathbb{R}_{\geq 0}$. The natural carrier is therefore the **substrate-pair carrier** $\mathbb{R}_{\geq 0} \times \mathbb{R}_{\geq 0}$ with the bound discipline $u \leq n$.
 
-- **Addition:** $(e_1, b_1) \oplus (e_2, b_2) = (e_1 + e_2,\ b_1 + b_2)$
-- **Multiplication:** $(e_1, b_1) \otimes (e_2, b_2) = (e_1 e_2,\ |e_1| b_2 + |e_2| b_1)$
-- **Scalar:** $a \odot (e, b) = (a e,\ |a| b)$
+The substrate-pair carrier is treated in the Memoirs as a subordinate corollary of the EB rigidity theorem (Ch 2, substrate-and-railing architecture; Ch 7, $B^2 \neq \mathrm{id}$ structural theorem and Remark on sign-rail $\Leftrightarrow$ symmetric-hull discipline). The substrate-pair carrier admits an analogue of the rigidity theorem only after restriction to the cone $\{(n, u) : u \leq n\}$, because the symmetric-hull evaluator $[n - u, n + u]$ leaves the non-negative substrate when $u > n$. The full EB rigidity theorem on $\mathbb{R} \times \mathbb{R}_{\geq 0}$ avoids the restriction by carrying a sign rail on the centre coordinate.
 
-These operations preserve non-negativity, satisfy associativity, and produce conservative bounds (verified across 70,054 deterministic test cases; Martin, 2025).
+For the present application, all input data satisfy $u \leq n$ trivially: the smallest nominal value is $4.2$ and the largest bound is $0.36$, with $0.36 \leq 4.2$. Bound discipline holds at the input.
 
-The framework was previously named "N/U Algebra" in earlier work (Martin, 2025); the present axiomatic characterisation (Martin, 2026) establishes that the same algebra is the unique solution within its axiom class.
+The pair operations on $(n, u) \in \mathbb{R}_{\geq 0} \times \mathbb{R}_{\geq 0}$ are inherited from the EB carrier and reduce, for non-negative inputs and non-negative scalars, to:
+
+- **Addition:** $(n_1, u_1) \oplus (n_2, u_2) = (n_1 + n_2,\ u_1 + u_2)$
+- **Multiplication:** $(n_1, u_1) \otimes (n_2, u_2) = (n_1 n_2,\ n_1 u_2 + n_2 u_1)$
+- **Scalar (non-negative $a$):** $a \odot (n, u) = (a n,\ a u)$
+
+(The full EB operations carry $|e_i|$ factors in multiplication and $|a|$ in scalar; for non-negative inputs these collapse to the displayed form.)
+
+**Bound-discipline preservation:** Addition preserves $u \leq n$ ($u_1 + u_2 \leq n_1 + n_2$ when each $u_i \leq n_i$). Non-negative scalar multiplication preserves it ($a u \leq a n$). Multiplication does not preserve $u \leq n$ strictly — it can produce $u' \leq 2 n'$ in the worst case — which is consistent with the subordinate-corollary status of the substrate-pair carrier. Multiplication is not used in this paper; the worked example below relies only on addition and scalar.
+
+The framework's operational core was previously named "N/U Algebra" (Martin, 2025); the formal characterisation now lives in Martin (2026), with the substrate-pair specialisation as the relevant subordinate corollary for non-negative count data.
 
 ---
 
